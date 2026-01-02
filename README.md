@@ -1,73 +1,54 @@
-# React + TypeScript + Vite
+# sona-ui
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React + TypeScript settings UI for configuring an AI assistant / productivity tool. It provides a single, polished "Settings" surface that can be embedded into a desktop-style host application.
 
-Currently, two official plugins are available:
+The UI focuses on configuring how the assistant behaves (models, intelligent mode, clipboard behavior, text selection awareness, hotkeys, etc.) while staying frontend-only and framework-agnostic on the backend side.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+## Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Centralized Settings Screen**
+  - Single Settings view rendered by `App.tsx` and `ui/Settings.tsx`.
+  - Desktop-style chrome and responsive layout via `common-components/DesktopLayout.tsx`.
 
-## Expanding the ESLint configuration
+- **Hotkey Configuration**
+  - Configure global or app-specific hotkeys in `HotKeySelectionSection`.
+  - Designed so a host app can wire these preferences to system-level shortcuts.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **Intelligent Mode Controls**
+  - Toggle and tune "Intelligent Mode" options in `IntelligentModeSection`.
+  - Backed by a dedicated Zustand store (`IntelligentModeStore.ts`) for predictable state.
 
-```js
-export default defineConfig([
-  globalIgnores(["dist"]),
-  {
-    files: ["**/*.{ts,tsx}"],
-    extends: [
-      // Other configs...
+- **Text Selection Awareness**
+  - Decide how the assistant should behave when there is selected text on screen (`TextSelectionAwarenessSection`).
+  - State is handled via `TextSelectionAwarenessStore.ts`.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- **Clipboard Behavior**
+  - Configure how clipboard contents should be used or monitored (`ClipboardBehaviourSection`).
+  - State is managed by `ClipboardStore.ts`.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ["./tsconfig.node.json", "./tsconfig.app.json"],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-]);
-```
+- **Model Management**
+  - **Current Model Selection** — choose the active AI model in `CurrentModelSection` using data from `ModelsStore.ts`.
+  - **Available Models List** — browse models defined in `data/available-models.ts` and rendered by `AvailableModelsSection`.
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+- **Explicit Save / Cancel Flow**
+  - `SaveCancelAction` section provides a clear way to apply or discard changes.
+  - Designed to support host apps that only persist settings on explicit save.
 
-```js
-// eslint.config.js
-import reactX from "eslint-plugin-react-x";
-import reactDom from "eslint-plugin-react-dom";
+- **Reusable UI Primitives**
+  - `src/common-components` exposes building blocks like `DesktopLayout`, `Stack`, `Text`, `DropDown`, `DownloadButton`, and `DeleteButton`.
+  - `src/components/ui` contains shadcn/Radix-style primitives (`button`, `dialog`, `popover`, `separator`, `spinner`, `switch`, `table`, `command`) used to compose higher-level settings components.
 
-export default defineConfig([
-  globalIgnores(["dist"]),
-  {
-    files: ["**/*.{ts,tsx}"],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs["recommended-typescript"],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ["./tsconfig.node.json", "./tsconfig.app.json"],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-]);
-```
+---
+
+## Tech Stack
+
+- **Core**
+  - [React](https://react.dev/) 19 (function components, hooks)
+  - [TypeScript](https://www.typescriptlang.org/)
+  - [Vite](https://vitejs.dev/) for dev server and bundling
+
+- **Styling**
+  - [Tailwind CSS](https://tailwindcss.com/) v4 via `@tailwindcss/vite`
+  - Utility helpers: `clsx`, `class-variance-authority`, `tailwind-merge`, `tw-animate-css`
