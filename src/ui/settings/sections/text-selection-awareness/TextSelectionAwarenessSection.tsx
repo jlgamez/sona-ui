@@ -30,10 +30,10 @@ export const TextSelectionAwarenessSection = () => {
       name={"Text Selection Awareness"}
       description={
         <>
-          "When enabled, Sona will consider your current text selection as part
-          of the conversation"
+          When enabled, Sona will consider your current text selection as part
+          of the conversation
           <br />
-          "Available only with Intelligent Mode"
+          Available only with Intelligent Mode
         </>
       }
       onChange={handleTextSelectionAwarenessChange}
