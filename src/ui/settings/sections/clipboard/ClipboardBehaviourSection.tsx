@@ -59,7 +59,7 @@ export const ClipboardBehaviourSection = () => {
         <ToggleSetting
           name={"Keep output in clipboard"}
           description={
-            "When enabled, Sona will keep your its latest output in your clipboard."
+            "When enabled, Sona will the latest output in the clipboard"
           }
           onChange={handleKeepOutputInClipboardChange}
           defaultChecked={isKeepOutputInClipboard}

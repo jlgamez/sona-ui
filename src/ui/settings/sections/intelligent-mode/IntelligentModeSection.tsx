@@ -13,9 +13,7 @@ export const IntelligentModeSection = () => {
   return (
     <ToggleSetting
       name={"Intelligent Mode"}
-      description={
-        "When enabled, Sona will respond to your speech instead of pasting it."
-      }
+      description={"When enabled, Sona will process and respond to your speech"}
       onChange={handleIntelligentModeChange}
       defaultChecked={isIntelligentModeEnabled}
     />

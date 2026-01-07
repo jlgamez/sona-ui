@@ -44,28 +44,28 @@ export const AvailableModelsSection = () => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {Array.from(getModels().values()).map((modelInfo) => (
-            <TableRow key={modelInfo.model.name}>
-              <TableCell>{modelInfo.model.name}</TableCell>
+          {Array.from(getModels().values()).map((model) => (
+            <TableRow key={model.name}>
+              <TableCell>{model.name}</TableCell>
               <TableCell className={"text-center"}>
-                {modelInfo.model.ram}
+                {model.requiredRam}
               </TableCell>
               <TableCell className="text-right">
-                {modelInfo.model.speed}
+                {model.relativeSpeed}
               </TableCell>
               <TableCell>
                 <div className={"ml-10"}>
-                  {modelInfo.status.isInSystem ? (
+                  {model.inSystem ? (
                     <DeleteButton
-                      onClick={() => handleDeleteClick(modelInfo.model.name)}
+                      onClick={() => handleDeleteClick(model.name)}
                     />
-                  ) : modelInfo.status.isDownloading ? (
+                  ) : model.isDownloading ? (
                     <Button size={"icon"} variant={"outline"}>
                       <Spinner />
                     </Button>
                   ) : (
                     <DownloadButton
-                      onClick={() => handleDownloadClick(modelInfo.model.name)}
+                      onClick={() => handleDownloadClick(model.name)}
                     />
                   )}
                 </div>

@@ -13,7 +13,7 @@ export const CurrentModelSection = () => {
     string | null
   >(null);
 
-  const { getModels, getModelStatus, setModelDownloading } = useModelsStore();
+  const { getModels, setModelDownloading } = useModelsStore();
   const models = Array.from(getModels().keys());
 
   const DOWNLOAD_WARNING = "Downloading %s...";
@@ -29,7 +29,7 @@ export const CurrentModelSection = () => {
     setCurrentSelectedModel(newModelSelection);
 
     // do not download the model if it is already in the system
-    if (getModelStatus(newModelSelection)?.isInSystem) return;
+    //if (getModelStatus(newModelSelection)?.isInSystem) return;
 
     // if not in system, update model status to downloading and display warning
     setModelDownloading(newModelSelection, true);
