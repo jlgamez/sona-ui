@@ -28,7 +28,7 @@ export const useModelsStore = create<ModelsState>((set, get) => ({
   setModelDownloading: (modelName: string, isDownloading: boolean) => {
     const { models } = get();
     const model = models.get(modelName);
-    if (model) {
+    if (model && model.isDownloading !== isDownloading) {
       const updatedModelsMap = new Map(models);
       updatedModelsMap.set(modelName, { ...model, isDownloading });
       set({ models: updatedModelsMap });
