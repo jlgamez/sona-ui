@@ -1,4 +1,4 @@
-import { Settings } from "@/ui/Settings.tsx";
+import { Settings } from "@/ui/settings/Settings.tsx";
 import DesktopLayout from "@/common-components/DesktopLayout.tsx";
 import { useEffect } from "react";
 import { useModelsStore } from "@/ui/settings/store/ModelsStore.ts";
