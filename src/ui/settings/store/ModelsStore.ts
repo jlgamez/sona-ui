@@ -1,86 +1,63 @@
 import { create } from "zustand";
-import { type WhisperModel, whisperModels } from "@/data/available-models";
-
-export type ModelStatus = {
-  isDownloading: boolean;
-  isInSystem: boolean;
-};
-export type ModelInfo = {
-  model: WhisperModel;
-  status: ModelStatus;
-};
+import type { WhisperModel } from "@/ui/settings/types/SettingsTypes.ts";
 
 interface ModelsState {
-  models: Map<string, ModelInfo>;
+  models: Map<string, WhisperModel>;
+  currentModelName: string;
 
   // Actions
   setModelDownloading: (modelName: string, isDownloading: boolean) => void;
   setModelInSystem: (modelName: string, isInSystem: boolean) => void;
-  initializeModels: () => void;
+  initializeModels: (models: WhisperModel[]) => void;
+  setCurrentModelName: (modelName: string) => void;
 
   // Getters
-  getModelStatus: (modelName: string) => ModelStatus | undefined;
-  getModels: () => Map<string, ModelInfo>;
+  getModel: (modelName: string) => WhisperModel | undefined;
+  getModels: () => Map<string, WhisperModel>;
+  getCurrentModelName: () => string;
 }
 
 export const useModelsStore = create<ModelsState>((set, get) => ({
   models: new Map(),
+  currentModelName: "",
 
-  initializeModels: () => {
-    const modelsMap = new Map<string, ModelInfo>();
-    whisperModels.forEach((model) => {
-      modelsMap.set(model.name, {
-        model: model,
-        status: {
-          isInSystem: model.inSystem,
-          isDownloading: false,
-        },
-      });
+  initializeModels: (modelsArray: WhisperModel[]) => {
+    const modelsMap = new Map<string, WhisperModel>();
+    modelsArray.forEach((model) => {
+      modelsMap.set(model.name, model);
     });
     set({ models: modelsMap });
   },
 
-  setModelDownloading: (chosenModel: string, isDownloading: boolean) => {
+  setCurrentModelName: (currentModelName: string) => {
+    set({ currentModelName: currentModelName });
+  },
+
+  setModelDownloading: (modelName: string, isDownloading: boolean) => {
     const { models } = get();
-    const model = models.get(chosenModel)?.model;
+    const model = models.get(modelName);
+    if (model && model.isDownloading !== isDownloading) {
+      const updatedModelsMap = new Map(models);
+      updatedModelsMap.set(modelName, { ...model, isDownloading });
+      set({ models: updatedModelsMap });
+    }
+  },
+
+  setModelInSystem: (modelName: string, isInSystem: boolean) => {
+    const { models } = get();
+    const model = models.get(modelName);
     if (model) {
       const updatedModelsMap = new Map(models);
-
-      updatedModelsMap.set(chosenModel, {
-        model: model,
-        status: {
-          // if downloading, model is not in system yet
-          isInSystem: false,
-          isDownloading: isDownloading,
-        },
+      updatedModelsMap.set(modelName, {
+        ...model,
+        inSystem: isInSystem,
+        isDownloading: false,
       });
       set({ models: updatedModelsMap });
     }
   },
 
-  setModelInSystem: (chosenModel: string, isInSystem: boolean) => {
-    const { models } = get();
-    const model = models.get(chosenModel)?.model;
-    if (model) {
-      const updatedModelsMap = new Map(models);
-
-      updatedModelsMap.set(chosenModel, {
-        model: model,
-        status: {
-          isInSystem: isInSystem,
-          // If model is now in system, it's no longer downloading
-          isDownloading: false,
-        },
-      });
-      set({ models: updatedModelsMap });
-    }
-  },
-
-  getModelStatus: (modelName: string) => {
-    return get().models.get(modelName)?.status;
-  },
+  getModel: (modelName: string) => get().models.get(modelName),
   getModels: () => get().models,
+  getCurrentModelName: () => get().currentModelName,
 }));
-
-// Initialize the store with available models
-useModelsStore.getState().initializeModels();

@@ -3,27 +3,25 @@ import Stack from "@/common-components/Stack.tsx";
 import {
   Table,
   TableBody,
-  TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table.tsx";
 
-import { DeleteButton } from "@/common-components/DeleteButton.tsx";
-import { DownloadButton } from "@/common-components/DownloadButton.tsx";
-import { Spinner } from "@/components/ui/spinner.tsx";
-import { Button } from "@/components/ui/button.tsx";
 import { useModelsStore } from "@/ui/settings/store/ModelsStore.ts";
+import { ModelRow } from "./ModelRow.tsx";
+import { deleteModel, downloadModel } from "@/api/PostActionsService.ts";
 
 export const AvailableModelsSection = () => {
   const { getModels, setModelDownloading, setModelInSystem } = useModelsStore();
 
   const handleDownloadClick = (modelName: string) => {
+    downloadModel(modelName);
     setModelDownloading(modelName, true);
   };
   const handleDeleteClick = (modelName: string) => {
+    deleteModel(modelName);
     setModelInSystem(modelName, false);
-    // setModelDownloading(modelName, false);
   };
 
   return (
@@ -44,33 +42,13 @@ export const AvailableModelsSection = () => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {Array.from(getModels().values()).map((modelInfo) => (
-            <TableRow key={modelInfo.model.name}>
-              <TableCell>{modelInfo.model.name}</TableCell>
-              <TableCell className={"text-center"}>
-                {modelInfo.model.ram}
-              </TableCell>
-              <TableCell className="text-right">
-                {modelInfo.model.speed}
-              </TableCell>
-              <TableCell>
-                <div className={"ml-10"}>
-                  {modelInfo.status.isInSystem ? (
-                    <DeleteButton
-                      onClick={() => handleDeleteClick(modelInfo.model.name)}
-                    />
-                  ) : modelInfo.status.isDownloading ? (
-                    <Button size={"icon"} variant={"outline"}>
-                      <Spinner />
-                    </Button>
-                  ) : (
-                    <DownloadButton
-                      onClick={() => handleDownloadClick(modelInfo.model.name)}
-                    />
-                  )}
-                </div>
-              </TableCell>
-            </TableRow>
+          {Array.from(getModels().values()).map((model) => (
+            <ModelRow
+              key={model.name}
+              model={model}
+              onDownload={handleDownloadClick}
+              onDelete={handleDeleteClick}
+            />
           ))}
         </TableBody>
       </Table>
