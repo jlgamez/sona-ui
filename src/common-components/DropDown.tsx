@@ -19,6 +19,7 @@ import {
 
 export type DropDownProps = {
   options: string[];
+  value?: string | null;
   placeholder?: string;
   emptyMessage?: string;
   className?: string;
@@ -27,22 +28,27 @@ export type DropDownProps = {
 
 export function DropDown({
   options,
+  value: controlledValue,
   placeholder = "Select option...",
   emptyMessage = "No option found.",
   className,
   onChange,
 }: DropDownProps) {
   const [open, setOpen] = React.useState(false);
-  const [value, setValue] = React.useState<string | null>(null);
+  const [internalValue, setInternalValue] = React.useState<string | null>(null);
 
+  const value = controlledValue !== undefined ? controlledValue : internalValue;
   const selectedLabel = value ?? "";
 
   const handleSelect = (currentValue: string) => {
-    const newValue = currentValue === value ? null : currentValue;
-    setValue(newValue);
+    if (currentValue === value) {
+      setOpen(false);
+      return; // already selected, just close
+    }
+    setInternalValue(currentValue);
     setOpen(false);
-    if (onChange && newValue !== null) {
-      onChange(newValue);
+    if (onChange) {
+      onChange(currentValue);
     }
   };
 

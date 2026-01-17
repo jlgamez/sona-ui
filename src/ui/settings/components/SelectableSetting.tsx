@@ -5,12 +5,13 @@ import Stack from "@/common-components/Stack.tsx";
 type Props = {
   name: string;
   options: string[];
+  value?: string | null;
   placeholder?: string;
   onChange?: (value: string) => void;
 };
 
 export const SelectableSetting = (props: Props) => {
-  const { name, options, placeholder, onChange } = props;
+  const { name, options, value, placeholder, onChange } = props;
 
   return (
     <Stack direction="column" spacing={2} align="start">
@@ -19,6 +20,7 @@ export const SelectableSetting = (props: Props) => {
       </Text>
       <DropDown
         options={options}
+        value={value}
         placeholder={placeholder}
         onChange={onChange}
       />

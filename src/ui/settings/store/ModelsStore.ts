@@ -3,19 +3,23 @@ import type { WhisperModel } from "@/ui/settings/types/SettingsTypes.ts";
 
 interface ModelsState {
   models: Map<string, WhisperModel>;
+  currentModelName: string;
 
   // Actions
   setModelDownloading: (modelName: string, isDownloading: boolean) => void;
   setModelInSystem: (modelName: string, isInSystem: boolean) => void;
   initializeModels: (models: WhisperModel[]) => void;
+  setCurrentModelName: (modelName: string) => void;
 
   // Getters
   getModel: (modelName: string) => WhisperModel | undefined;
   getModels: () => Map<string, WhisperModel>;
+  getCurrentModelName: () => string;
 }
 
 export const useModelsStore = create<ModelsState>((set, get) => ({
   models: new Map(),
+  currentModelName: "",
 
   initializeModels: (modelsArray: WhisperModel[]) => {
     const modelsMap = new Map<string, WhisperModel>();
@@ -23,6 +27,10 @@ export const useModelsStore = create<ModelsState>((set, get) => ({
       modelsMap.set(model.name, model);
     });
     set({ models: modelsMap });
+  },
+
+  setCurrentModelName: (currentModelName: string) => {
+    set({ currentModelName: currentModelName });
   },
 
   setModelDownloading: (modelName: string, isDownloading: boolean) => {
@@ -51,4 +59,5 @@ export const useModelsStore = create<ModelsState>((set, get) => ({
 
   getModel: (modelName: string) => get().models.get(modelName),
   getModels: () => get().models,
+  getCurrentModelName: () => get().currentModelName,
 }));

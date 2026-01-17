@@ -3,38 +3,37 @@ import Stack from "@/common-components/Stack.tsx";
 import Text from "@/common-components/Text.tsx";
 import { Spinner } from "@/components/ui/spinner.tsx";
 import { useModelsStore } from "@/ui/settings/store/ModelsStore.ts";
-import { useState } from "react";
+import { downloadModel } from "@/ui/settings/service/PostActionsService.ts";
+import { useCheckModelDownloadState } from "@/ui/settings/hooks/useCheckModelDownloadState.tsx";
 
 export const CurrentModelSection = () => {
-  const [currentSelectedModel, setCurrentSelectedModel] = useState<
-    string | null
-  >(null);
-  const [currentDownloadMessage, setCurrentDownloadMessage] = useState<
-    string | null
-  >(null);
-
-  const { getModels, setModelDownloading } = useModelsStore();
+  const { getModels, getModel, setCurrentModelName, setModelDownloading } =
+    useModelsStore();
   const models = Array.from(getModels().keys());
+  let currentModelName = useModelsStore((state) => state.currentModelName);
+
+  // Subscribe to store's downloading state for the selected model
+  const isDownloading = useModelsStore(
+    (state) => state.models.get(currentModelName ?? "")?.isDownloading ?? false,
+  );
+
+  // Poll download state when downloading
+  useCheckModelDownloadState(currentModelName ?? "");
 
   const DOWNLOAD_WARNING = "Downloading %s...";
   const getDownloadWarning = (modelName: string) =>
     DOWNLOAD_WARNING.replace("%s", modelName);
 
   const onSelect = (newModelSelection: string) => {
-    // clear download warning when the model changes
-    if (currentSelectedModel !== newModelSelection)
-      setCurrentDownloadMessage(null);
+    setCurrentModelName(newModelSelection);
 
-    // indicate the new selected model
-    setCurrentSelectedModel(newModelSelection);
+    // Skip download if model is already in the system
+    const model = getModel(newModelSelection);
+    if (model?.inSystem) return;
 
-    // do not download the model if it is already in the system
-    //if (getModelStatus(newModelSelection)?.isInSystem) return;
-
-    // if not in system, update model status to downloading and display warning
+    // Trigger actual download and update store
+    downloadModel(newModelSelection);
     setModelDownloading(newModelSelection, true);
-    const downloadWarning = getDownloadWarning(newModelSelection);
-    setCurrentDownloadMessage(downloadWarning);
   };
 
   return (
@@ -44,8 +43,9 @@ export const CurrentModelSection = () => {
         placeholder={"Select transcription model"}
         options={models}
         onChange={onSelect}
+        value={currentModelName}
       />
-      {currentDownloadMessage && (
+      {isDownloading && currentModelName && (
         <Stack
           direction={"row"}
           spacing={2}
@@ -53,7 +53,7 @@ export const CurrentModelSection = () => {
           className={"pt-8 ml-16"}
         >
           <Text as={"p"} tone={"muted"}>
-            {currentDownloadMessage}
+            {getDownloadWarning(currentModelName)}
           </Text>
           <Spinner />
         </Stack>

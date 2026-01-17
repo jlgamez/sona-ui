@@ -10,3 +10,17 @@ export const deleteModel = (modelName: string) => {
   const url = buildUrlWith(ENDPOINT.DELETE_MODEL);
   post(url, { name: modelName });
 };
+
+export type UserConfigPayload = {
+  hot_key: string;
+  clipboard_behaviour?: {
+    autonomous_pasting: boolean;
+    keep_output_in_clipboard: boolean;
+  };
+  current_model: string;
+};
+
+export const saveUserConfig = (config: UserConfigPayload) => {
+  const url = buildUrlWith(ENDPOINT.USER_CONFIG);
+  post(url, undefined, config);
+};

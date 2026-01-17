@@ -3,19 +3,37 @@ import DesktopLayout from "@/common-components/DesktopLayout.tsx";
 import { useEffect } from "react";
 import { useModelsStore } from "@/ui/settings/store/ModelsStore.ts";
 import { useFetchAvailableModels } from "@/ui/settings/hooks/useFetchAvailableModels.tsx";
+import { useFetchUserConfig } from "@/ui/settings/hooks/useFetchUserConfig.tsx";
+import { useHotKeyStore } from "@/ui/settings/store/HotKeyStore.ts";
 import { Spinner } from "@/components/ui/spinner.tsx";
 
 function App() {
-  const { initializeModels } = useModelsStore();
-  const { loading, models, error } = useFetchAvailableModels();
+  const { initializeModels, setCurrentModelName } = useModelsStore();
+  const { initializeHotKeyWith } = useHotKeyStore();
+  const {
+    loading: modelsLoading,
+    models,
+    error: modelsError,
+  } = useFetchAvailableModels();
+  const {
+    loading: configLoading,
+    config,
+    error: configError,
+  } = useFetchUserConfig();
 
   useEffect(() => {
-    if (!loading && !error) initializeModels(models);
-  }, [loading, error]);
+    if (!modelsLoading && !modelsError) initializeModels(models);
+  }, [modelsLoading, modelsError]);
 
-  if (loading || models.length === 0) return <Spinner />;
+  useEffect(() => {
+    if (!configLoading && !configError && config) {
+      initializeHotKeyWith(config.hot_key);
+      setCurrentModelName(config.current_model);
+    }
+  }, [configLoading, configError, config]);
 
-  if (error) return <div>There was an error loading models</div>;
+  const isLoading = modelsLoading || configLoading || models.length === 0;
+  const hasError = modelsError || configError;
 
   return (
     <DesktopLayout
@@ -25,7 +43,17 @@ function App() {
       devOnly={false}
       className="p-6"
     >
-      <Settings />
+      {hasError ? (
+        <div className={"flex justify-center items-center h-screen w-full"}>
+          There was an error loading settings
+        </div>
+      ) : isLoading ? (
+        <div className={"flex justify-center items-center h-screen w-full"}>
+          <Spinner />
+        </div>
+      ) : (
+        <Settings />
+      )}
     </DesktopLayout>
   );
 }
