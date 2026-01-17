@@ -5,3 +5,8 @@ export const downloadModel = (modelName: string) => {
   const url = buildUrlWith(ENDPOINT.DOWNLOAD_MODEL);
   post(url, { name: modelName });
 };
+
+export const deleteModel = (modelName: string) => {
+  const url = buildUrlWith(ENDPOINT.DELETE_MODEL);
+  post(url, { name: modelName });
+};

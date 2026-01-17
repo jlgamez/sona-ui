@@ -10,7 +10,10 @@ import {
 
 import { useModelsStore } from "@/ui/settings/store/ModelsStore.ts";
 import { ModelRow } from "./ModelRow.tsx";
-import { downloadModel } from "@/ui/settings/service/PostActionsService.ts";
+import {
+  deleteModel,
+  downloadModel,
+} from "@/ui/settings/service/PostActionsService.ts";
 
 export const AvailableModelsSection = () => {
   const { getModels, setModelDownloading, setModelInSystem } = useModelsStore();
@@ -20,8 +23,8 @@ export const AvailableModelsSection = () => {
     setModelDownloading(modelName, true);
   };
   const handleDeleteClick = (modelName: string) => {
+    deleteModel(modelName);
     setModelInSystem(modelName, false);
-    // setModelDownloading(modelName, false);
   };
 
   return (
