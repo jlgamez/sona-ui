@@ -4,11 +4,12 @@ import { useIntelligentModeStore } from "@/ui/settings/store/IntelligentModeStor
 import { useEffect } from "react";
 
 export const TextSelectionAwarenessSection = () => {
-  const { getIsTextSelectionAwarenessOn, setTextSelectionAwarenessOn } =
-    useTextSelectionAwarenessStore();
+  const { setTextSelectionAwarenessOn } = useTextSelectionAwarenessStore();
   const { getIsIntelligentModeEnabled } = useIntelligentModeStore();
 
-  let isSelectionAwarenessEnabled = getIsTextSelectionAwarenessOn();
+  const isSelectionAwarenessEnabled = useTextSelectionAwarenessStore(
+    (state) => state.isTextSelectionAwarenessOn,
+  );
   const isIntelligentModeEnabled = getIsIntelligentModeEnabled();
 
   const handleTextSelectionAwarenessChange = (isOn: boolean) => {
@@ -37,7 +38,7 @@ export const TextSelectionAwarenessSection = () => {
         </>
       }
       onChange={handleTextSelectionAwarenessChange}
-      defaultChecked={isSelectionAwarenessEnabled}
+      //defaultChecked={isSelectionAwarenessEnabled}
       checked={isSelectionAwarenessEnabled}
       enabled={isIntelligentModeEnabled}
     />

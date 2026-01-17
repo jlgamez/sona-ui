@@ -10,10 +10,7 @@ import {
 
 import { useModelsStore } from "@/ui/settings/store/ModelsStore.ts";
 import { ModelRow } from "./ModelRow.tsx";
-import {
-  deleteModel,
-  downloadModel,
-} from "@/ui/settings/service/PostActionsService.ts";
+import { deleteModel, downloadModel } from "@/api/PostActionsService.ts";
 
 export const AvailableModelsSection = () => {
   const { getModels, setModelDownloading, setModelInSystem } = useModelsStore();

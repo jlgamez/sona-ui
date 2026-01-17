@@ -3,14 +3,14 @@ import Stack from "@/common-components/Stack.tsx";
 import Text from "@/common-components/Text.tsx";
 import { Spinner } from "@/components/ui/spinner.tsx";
 import { useModelsStore } from "@/ui/settings/store/ModelsStore.ts";
-import { downloadModel } from "@/ui/settings/service/PostActionsService.ts";
+import { downloadModel } from "@/api/PostActionsService.ts";
 import { useCheckModelDownloadState } from "@/ui/settings/hooks/useCheckModelDownloadState.tsx";
 
 export const CurrentModelSection = () => {
   const { getModels, getModel, setCurrentModelName, setModelDownloading } =
     useModelsStore();
   const models = Array.from(getModels().keys());
-  let currentModelName = useModelsStore((state) => state.currentModelName);
+  const currentModelName = useModelsStore((state) => state.currentModelName);
 
   // Subscribe to store's downloading state for the selected model
   const isDownloading = useModelsStore(

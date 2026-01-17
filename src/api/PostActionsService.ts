@@ -12,12 +12,14 @@ export const deleteModel = (modelName: string) => {
 };
 
 export type UserConfigPayload = {
-  hot_key: string;
-  clipboard_behaviour?: {
+  clipboard_behaviour: {
     autonomous_pasting: boolean;
     keep_output_in_clipboard: boolean;
   };
   current_model: string;
+  hot_key: string;
+  intelligent_mode: boolean;
+  text_selection_awareness: boolean;
 };
 
 export const saveUserConfig = (config: UserConfigPayload) => {

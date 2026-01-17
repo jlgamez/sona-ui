@@ -6,10 +6,17 @@ import { useFetchAvailableModels } from "@/ui/settings/hooks/useFetchAvailableMo
 import { useFetchUserConfig } from "@/ui/settings/hooks/useFetchUserConfig.tsx";
 import { useHotKeyStore } from "@/ui/settings/store/HotKeyStore.ts";
 import { Spinner } from "@/components/ui/spinner.tsx";
+import { useClipboardStore } from "@/ui/settings/store/ClipboardStore.ts";
+import { useIntelligentModeStore } from "@/ui/settings/store/IntelligentModeStore.ts";
+import { useTextSelectionAwarenessStore } from "@/ui/settings/store/TextSelectionAwarenessStore.ts";
 
 function App() {
   const { initializeModels, setCurrentModelName } = useModelsStore();
   const { initializeHotKeyWith } = useHotKeyStore();
+  const { setAutonomousPasteOn, setKeepOutputInClipboardOn } =
+    useClipboardStore();
+  const { setIsIntelligentModeEnabled } = useIntelligentModeStore();
+  const { setTextSelectionAwarenessOn } = useTextSelectionAwarenessStore();
   const {
     loading: modelsLoading,
     models,
@@ -28,6 +35,12 @@ function App() {
   useEffect(() => {
     if (!configLoading && !configError && config) {
       initializeHotKeyWith(config.hot_key);
+      setAutonomousPasteOn(config.clipboard_behaviour.autonomous_pasting);
+      setKeepOutputInClipboardOn(
+        config.clipboard_behaviour.keep_output_in_clipboard,
+      );
+      setIsIntelligentModeEnabled(config.intelligent_mode);
+      setTextSelectionAwarenessOn(config.text_selection_awareness);
       setCurrentModelName(config.current_model);
     }
   }, [configLoading, configError, config]);
