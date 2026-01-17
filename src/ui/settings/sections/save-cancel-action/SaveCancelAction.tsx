@@ -10,7 +10,11 @@ import { useModelsStore } from "@/ui/settings/store/ModelsStore.ts";
 import { useIntelligentModeStore } from "@/ui/settings/store/IntelligentModeStore.ts";
 import { useTextSelectionAwarenessStore } from "@/ui/settings/store/TextSelectionAwarenessStore.ts";
 
-export const SaveCancelAction = () => {
+type SaveCancelActionProps = {
+  onClose?: () => void;
+};
+
+export const SaveCancelAction = ({ onClose }: SaveCancelActionProps) => {
   const handleSave = () => {
     const selectedHotKey = useHotKeyStore.getState().selectedHotKey;
     const { autonomousPasteOn, keepOutputInClipboardOn } =
@@ -36,12 +40,15 @@ export const SaveCancelAction = () => {
       intelligent_mode: isIntelligentModeEnabled,
       text_selection_awareness: isTextSelectionAwarenessOn,
     });
+    onClose?.();
   };
 
   return (
     <div className="w-full flex justify-end p-10">
       <Stack direction={"row"} spacing={4} align={"end"}>
-        <Button variant={"outline"}>Cancel</Button>
+        <Button variant={"outline"} onClick={onClose}>
+          Cancel
+        </Button>
         <Button onClick={handleSave}>Save</Button>
       </Stack>
     </div>

@@ -9,7 +9,11 @@ import { HotKeySelectionSection } from "@/ui/settings/sections/hot-key/HotKeySel
 import { SaveCancelAction } from "@/ui/settings/sections/save-cancel-action/SaveCancelAction.tsx";
 import { TextSelectionAwarenessSection } from "@/ui/settings/sections/text-selection-awareness/TextSelectionAwarenessSection.tsx";
 
-export const Settings = () => {
+type SettingsProps = {
+  onClose?: () => void;
+};
+
+export const Settings = ({ onClose }: SettingsProps) => {
   return (
     <div className={"relative h-full w-full"}>
       <div className={"pl-5 pr-5 min-w-full mb-4"}>
@@ -34,7 +38,7 @@ export const Settings = () => {
         <CurrentModelSection />
         <Separator />
         <AvailableModelsSection />
-        <SaveCancelAction />
+        <SaveCancelAction onClose={onClose} />
       </Stack>
     </div>
   );

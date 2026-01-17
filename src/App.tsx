@@ -1,6 +1,7 @@
 import { Settings } from "@/ui/settings/Settings.tsx";
+import { Welcome } from "@/ui/welcome/Welcome.tsx";
 import DesktopLayout from "@/common-components/DesktopLayout.tsx";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useModelsStore } from "@/ui/settings/store/ModelsStore.ts";
 import { useFetchAvailableModels } from "@/ui/settings/hooks/useFetchAvailableModels.tsx";
 import { useFetchUserConfig } from "@/ui/settings/hooks/useFetchUserConfig.tsx";
@@ -9,6 +10,7 @@ import { Spinner } from "@/components/ui/spinner.tsx";
 import { useClipboardStore } from "@/ui/settings/store/ClipboardStore.ts";
 import { useIntelligentModeStore } from "@/ui/settings/store/IntelligentModeStore.ts";
 import { useTextSelectionAwarenessStore } from "@/ui/settings/store/TextSelectionAwarenessStore.ts";
+import { motion } from "motion/react";
 
 function App() {
   const { initializeModels, setCurrentModelName } = useModelsStore();
@@ -47,6 +49,14 @@ function App() {
 
   const isLoading = modelsLoading || configLoading || models.length === 0;
   const hasError = modelsError || configError;
+  const [currentPage, setCurrentPage] = useState<"welcome" | "settings">(
+    "welcome",
+  );
+
+  const pageVariants = {
+    initial: { opacity: 0, x: 35 },
+    animate: { opacity: 1, x: 0 },
+  };
 
   return (
     <DesktopLayout
@@ -65,7 +75,20 @@ function App() {
           <Spinner />
         </div>
       ) : (
-        <Settings />
+        <motion.div
+          key={currentPage}
+          initial="initial"
+          animate="animate"
+          transition={{ duration: 0.3, ease: "easeOut" }}
+          variants={pageVariants}
+          className="h-full w-full"
+        >
+          {currentPage === "welcome" ? (
+            <Welcome onNavigateToSettings={() => setCurrentPage("settings")} />
+          ) : (
+            <Settings onClose={() => setCurrentPage("welcome")} />
+          )}
+        </motion.div>
       )}
     </DesktopLayout>
   );
