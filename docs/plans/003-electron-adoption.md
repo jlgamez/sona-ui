@@ -62,10 +62,15 @@ The order is deliberate. Phases 1 to 3 prove the risky parts first (the frozen b
 - Main waits up to 90 s for readiness (a cold backend start takes about 24 s), so the window opens only when the API answers.
 - Exit: one command opens the settings window with the backend started and stopped automatically.
 
-### Phase 3: Signed build and permissions (risk gate)
+### Phase 3: Packaged build and permissions (risk gate), done with an ad-hoc signature
 
 - Package with `electron-builder`, add the usage descriptions to `Info.plist`, and sign with a Developer ID certificate.
 - Microphone, Accessibility and Input Monitoring are granted per signed app, and the Python child process may not inherit them from Electron. Test hotkey, record, transcribe and paste from the installed app.
+- Result (tested with an ad-hoc signature, since there is no Developer ID yet): the full flow works from `/Applications/Sona.app`. The backend child process uses the grants of the app, so no redesign is needed.
+  - The hardened runtime needs the `allow-jit` entitlement or Electron crashes on start (`build/entitlements.mac.plist`).
+  - Only Microphone prompts by itself. Accessibility (needed for paste) and Input Monitoring (hotkey) had to be added by hand in System Settings, which is the job of phase 5.
+  - Ad-hoc rebuilds change the code signature, so grants can go stale and need removing and adding again. A stable Developer ID signature fixes this (phase 6).
+  - Build with `npm run backend:copy && npm run pack`; the app is `release/mac-arm64/Sona.app`.
 - Exit: the full flow works from `/Applications/Sona.app`. If the child process does not inherit the permissions, rework the design here (for example, run the hotkey and recording in a helper that is itself signed) before building more.
 
 ### Phase 4: App behaviour
