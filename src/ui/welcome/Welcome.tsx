@@ -1,8 +1,9 @@
 import Stack from "@/common-components/Stack.tsx";
 import Text from "@/common-components/Text.tsx";
 import { Button } from "@/components/ui/button.tsx";
-import { ArrowRight, Mic } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { motion } from "motion/react";
+import sonaIcon from "@/assets/sona-icon.png";
 
 type WelcomeProps = {
   onNavigateToSettings: () => void;
@@ -22,9 +23,8 @@ export const Welcome = ({ onNavigateToSettings }: WelcomeProps) => {
         initial={{ opacity: 0, scale: 0.8, y: 24 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ duration: 0.5, ease: "easeOut", delay: 0.05 }}
-        className="rounded-full bg-primary/10 p-6"
       >
-        <Mic className="size-12 text-primary" />
+        <img src={sonaIcon} alt="Sona" className="size-28" />
       </motion.div>
 
       {/* Heading & Description */}
