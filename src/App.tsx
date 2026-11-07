@@ -8,7 +8,6 @@ import { useFetchUserConfig } from "@/ui/settings/hooks/useFetchUserConfig.tsx";
 import { Spinner } from "@/components/ui/spinner.tsx";
 import { motion } from "motion/react";
 import { Toaster } from "sonner";
-import { applyConfigToStores } from "@/ui/settings/applyConfigToStores.ts";
 
 function App() {
   const { initializeModels } = useModelsStore();
@@ -27,10 +26,6 @@ function App() {
   useEffect(() => {
     if (!modelsLoading && !modelsError) initializeModels(models);
   }, [modelsLoading, modelsError]);
-
-  useEffect(() => {
-    if (config) applyConfigToStores(config);
-  }, [config]);
 
   const isLoading =
     modelsLoading || configLoading || models.length === 0 || !config;
@@ -75,7 +70,7 @@ function App() {
           ) : (
             <Settings
               savedConfig={config}
-              onSaved={setConfig}
+              onSavedConfigChange={setConfig}
               onClose={() => setCurrentPage("welcome")}
             />
           )}

@@ -50,3 +50,7 @@ export function post<T>(
     body: body !== undefined ? JSON.stringify(body) : undefined,
   });
 }
+
+export function describeError(error: unknown): string {
+  return error instanceof ApiError ? error.message : "Could not reach Sona";
+}

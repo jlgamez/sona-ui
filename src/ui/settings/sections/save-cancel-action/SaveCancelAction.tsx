@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button.tsx";
 import { Spinner } from "@/components/ui/spinner.tsx";
 import Stack from "@/common-components/Stack.tsx";
-import { ApiError } from "@/api/FetchUtils.ts";
+import { describeError } from "@/api/FetchUtils.ts";
 import { saveUserConfig } from "@/api/PostActionsService.ts";
 import { applyConfigToStores } from "@/ui/settings/applyConfigToStores.ts";
 import { useDraftConfig } from "@/ui/settings/hooks/useDraftConfig.ts";
@@ -11,13 +11,13 @@ import type { UserConfig } from "@/ui/settings/types/SettingsTypes.ts";
 
 type SaveCancelActionProps = {
   savedConfig: UserConfig;
-  onSaved: (config: UserConfig) => void;
+  onSavedConfigChange: (config: UserConfig) => void;
   onClose?: () => void;
 };
 
 export const SaveCancelAction = ({
   savedConfig,
-  onSaved,
+  onSavedConfigChange,
   onClose,
 }: SaveCancelActionProps) => {
   const draft = useDraftConfig(savedConfig);
@@ -29,13 +29,11 @@ export const SaveCancelAction = ({
     setIsSaving(true);
     try {
       await saveUserConfig(draft);
-      onSaved(draft);
+      onSavedConfigChange(draft);
       toast.success("Settings saved");
       onClose?.();
     } catch (error) {
-      toast.error(
-        error instanceof ApiError ? error.message : "Could not reach Sona",
-      );
+      toast.error(describeError(error));
     } finally {
       setIsSaving(false);
     }

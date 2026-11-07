@@ -12,11 +12,15 @@ import type { UserConfig } from "@/ui/settings/types/SettingsTypes.ts";
 
 type SettingsProps = {
   savedConfig: UserConfig;
-  onSaved: (config: UserConfig) => void;
+  onSavedConfigChange: (config: UserConfig) => void;
   onClose?: () => void;
 };
 
-export const Settings = ({ savedConfig, onSaved, onClose }: SettingsProps) => {
+export const Settings = ({
+  savedConfig,
+  onSavedConfigChange,
+  onClose,
+}: SettingsProps) => {
   return (
     <div className={"relative h-full w-full"}>
       <div className={"pl-5 pr-5 min-w-full mb-4"}>
@@ -40,10 +44,10 @@ export const Settings = ({ savedConfig, onSaved, onClose }: SettingsProps) => {
         <Separator />
         <CurrentModelSection />
         <Separator />
-        <AvailableModelsSection />
+        <AvailableModelsSection onSavedConfigChange={onSavedConfigChange} />
         <SaveCancelAction
           savedConfig={savedConfig}
-          onSaved={onSaved}
+          onSavedConfigChange={onSavedConfigChange}
           onClose={onClose}
         />
       </Stack>

@@ -1,6 +1,6 @@
 # 002: Critical UI fixes
 
-Status: items 1, 2 and 4 done; the rest planned. Scope is steps 1 and 2 of the order in `001-ui-electron-assessment.md`. Each item is a separate commit.
+Status: items 1 to 4 done; items 5 and 6 planned. Scope is steps 1 and 2 of the order in `001-ui-electron-assessment.md`. Each item is a separate commit.
 
 Backend API (repo `sona`): `GET/POST /api/user-config`, `GET /api/models`, `GET /api/hot-keys`, `GET /api/audio-devices`, `POST /api/download-model?name=`, `GET /api/model-download-state?name=`, `POST /api/delete-model?name=`. Errors come back as `{"success": false, "error": "..."}` with a 4xx or 5xx status.
 
@@ -33,16 +33,17 @@ Checked against a stub backend: Save disabled until a change, Cancel reverts, fa
 
 ## 3. Model deletion and download
 
-Problems: no delete confirmation (bug 5), stale current model after deleting it (bug 4), silent download failure (bug 6), optimistic updates that are never rolled back.
+Problems: no delete confirmation (bug 5), stale current model after deleting it (bug 4), silent download failure (bug 6), optimistic updates that were never rolled back, and a race where polling could see "not started" before the backend tracked the download.
 
-Changes:
-- Delete opens a confirmation dialog (existing `components/ui/dialog`): "Delete model X? You can download it again later." Cancel and a destructive Delete button. Focus returns to the row button on close.
-- Do not flip `inSystem` before the request returns. Await `deleteModel`, then update the store. On error, show a toast.
-- After a successful delete, re-fetch `GET /api/user-config` and update `currentModelName` (the backend resets it when the deleted model was active).
-- Download: set `isDownloading` on click, and roll it back with an error toast if `downloadModel` rejects. When polling `model-download-state` ends with `not_started` after a download was started, show a "Download of X failed" toast. A download that ends in `completed` shows nothing special.
-- Disable the delete button for the model currently selected, or explain that the default will be used. Choose the second: the dialog states "This is your current model. Sona will switch to the default model."
+Done (see `modelActions.ts`, `DeleteModelDialog.tsx`, `useCheckModelDownloadState.tsx`):
+- `startModelDownload` and `removeModel` are the one place that calls the API, updates the model store and reports errors with a toast. The downloading flag is set only after the backend accepted the request, which removes the race.
+- Delete asks for confirmation. For the current model the dialog says Sona will switch to another model.
+- After a delete, the saved config is re-fetched. If the deleted model was selected in the stores, the selection follows the backend. Other unsaved edits are kept. The config is applied to the stores once on load, not on every change.
+- A download that ends without the model shows "Download of X failed". Polling ignores transient network errors and now runs once per model (the Current Model section no longer polls on its own).
 
-Done when: deleting the active model updates the Current model section; a failed download shows a toast and returns the row to the download button; delete asks for confirmation.
+Not included: cancelling a download (the backend has no endpoint), so Cancel in Settings reverts the selection but a started download continues. Blocking Save while the chosen model is still downloading is a possible follow-up.
+
+Checked against a stub backend: successful download, failed request, failed download, delete (cancel and confirm), delete of the current model with an unsaved edit, failed delete, and downloading from the Current Model dropdown.
 
 ## 4. Coming soon: Intelligent Mode and Text Selection Awareness
 

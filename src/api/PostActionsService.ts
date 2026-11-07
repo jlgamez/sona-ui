@@ -4,7 +4,7 @@ import type { UserConfig } from "@/ui/settings/types/SettingsTypes.ts";
 
 export const downloadModel = (modelName: string) => {
   const url = buildUrlWith(ENDPOINT.DOWNLOAD_MODEL);
-  return post(url, { name: modelName });
+  return post<{ state: "accepted" | "completed" }>(url, { name: modelName });
 };
 
 export const deleteModel = (modelName: string) => {

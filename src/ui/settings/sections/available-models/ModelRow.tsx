@@ -1,6 +1,7 @@
 import { TableCell, TableRow } from "@/components/ui/table.tsx";
 import { DownloadButton } from "@/common-components/DownloadButton.tsx";
-import { DeleteButton } from "@/common-components/DeleteButton.tsx";
+import { DeleteModelDialog } from "./DeleteModelDialog.tsx";
+import { useModelsStore } from "@/ui/settings/store/ModelsStore.ts";
 import { Button } from "@/components/ui/button.tsx";
 import { Spinner } from "@/components/ui/spinner.tsx";
 import { useCheckModelDownloadState } from "@/ui/settings/hooks/useCheckModelDownloadState.tsx";
@@ -14,6 +15,9 @@ interface ModelRowProps {
 
 export const ModelRow = ({ model, onDownload, onDelete }: ModelRowProps) => {
   useCheckModelDownloadState(model.name);
+  const isCurrentModel = useModelsStore(
+    (state) => state.currentModelName === model.name,
+  );
 
   return (
     <TableRow>
@@ -23,7 +27,11 @@ export const ModelRow = ({ model, onDownload, onDelete }: ModelRowProps) => {
       <TableCell>
         <div className={"ml-10"}>
           {model.inSystem ? (
-            <DeleteButton onClick={() => onDelete(model.name)} />
+            <DeleteModelDialog
+              modelName={model.name}
+              isCurrentModel={isCurrentModel}
+              onConfirm={() => onDelete(model.name)}
+            />
           ) : model.isDownloading ? (
             <Button size={"icon"} variant={"outline"}>
               <Spinner />

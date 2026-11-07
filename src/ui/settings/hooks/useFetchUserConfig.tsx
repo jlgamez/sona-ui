@@ -1,17 +1,18 @@
 import { useEffect, useState } from "react";
-import { buildUrlWith, get } from "@/api/FetchUtils";
-import { ENDPOINT } from "@/api/ApiConstants";
+import { fetchUserConfig } from "@/api/GetActionsService";
+import { applyConfigToStores } from "@/ui/settings/applyConfigToStores";
 import type { UserConfig } from "@/ui/settings/types/SettingsTypes";
 
+/** Loads the saved config once and applies it to the settings stores. */
 export function useFetchUserConfig() {
   const [config, setConfig] = useState<UserConfig | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const url = buildUrlWith(ENDPOINT.USER_CONFIG);
-    get<UserConfig>(url)
+    fetchUserConfig()
       .then((data) => {
+        applyConfigToStores(data);
         setConfig(data);
         setLoading(false);
       })
