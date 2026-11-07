@@ -31,11 +31,12 @@ function getFreePort(): Promise<number> {
 }
 
 function backendPath(): string {
-  // Dev: sibling checkout of the sona repo. Packaged path comes in phase 3.
-  return (
-    process.env.SONA_BACKEND_PATH ??
-    path.resolve(here, "../../../sona/dist/sona-backend/sona-backend")
-  );
+  if (process.env.SONA_BACKEND_PATH) return process.env.SONA_BACKEND_PATH;
+  if (app.isPackaged) {
+    return path.join(process.resourcesPath, "sona-backend", "sona-backend");
+  }
+  // Dev: sibling checkout of the sona repo.
+  return path.resolve(here, "../../../sona/dist/sona-backend/sona-backend");
 }
 
 function startBackend(port: number): ChildProcess {
