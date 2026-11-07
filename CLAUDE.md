@@ -6,7 +6,7 @@
 
 ## Quick Reference
 
-- **Install and run:** `npm install`, then `npm run dev` (Electron; main spawns the backend from `../sona/dist/sona-backend/`, override with `SONA_BACKEND_PATH`). `npm run dev:web` is plain Vite (port 5173) against a backend you start yourself; `npm run start` previews the production build. `npm run backend:copy && npm run pack` builds `release/mac-arm64/Sona.app` (ad-hoc signed, with the backend in `Resources/sona-backend/`)
+- **Install and run:** `npm install`, then `npm run dev` (Electron; main spawns the backend from `../sona/dist/sona-backend/`, override with `SONA_BACKEND_PATH`). `npm run dev:web` is plain Vite (port 5173) against a backend you start yourself; `npm run start` previews the production build. `npm run backend:copy && npm run pack` builds `release/mac-arm64/Sona.app` (ad-hoc signed, with the backend in `Resources/sona-backend/`). The app is menu bar only (`electron/tray.ts`): closing the window hides it, Quit is in the tray menu, single instance, optional start at login. Rebuilt apps lose their macOS grants (see plan 003 phase 4)
 - **Backend URL:** the preload script exposes `window.sona.apiBaseUrl` (free port chosen by main); `ApiConstants.BASE_URL` falls back to `VITE_API_BASE_URL`, then port 5000
 - **Check:** `npm run build` (runs `tsc -b`) and `npm run lint`. There are no tests yet
 - **Backend URL:** `VITE_API_BASE_URL`, default `http://127.0.0.1:5000`. Start the backend with `python run.py` (or `--port N`) in the `sona` repo. Port 5000 can clash with macOS AirPlay Receiver

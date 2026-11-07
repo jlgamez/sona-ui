@@ -73,10 +73,13 @@ The order is deliberate. Phases 1 to 3 prove the risky parts first (the frozen b
   - Build with `npm run backend:copy && npm run pack`; the app is `release/mac-arm64/Sona.app`.
 - Exit: the full flow works from `/Applications/Sona.app`. If the child process does not inherit the permissions, rework the design here (for example, run the hotkey and recording in a helper that is itself signed) before building more.
 
-### Phase 4: App behaviour
+### Phase 4: App behaviour, done
 
 - Tray icon with Open Settings and Quit, hide on close, single instance lock, optional start at login.
 - Shut the backend down on quit, and kill it if Electron crashes.
+- Result: menu bar only (`LSUIElement`, no Dock icon), tray menu with Open Settings, a "Start at login" checkbox (off by default) and Quit. Closing the window hides it. A second launch focuses the running instance. The backend runs with `--exit-when-parent-dies` and a stdin pipe, so it stops within seconds if Electron is killed with `kill -9`.
+- The tray icon is a generated placeholder (`build/trayTemplate.png`); replace it with real artwork.
+- A rebuilt, re-signed app loses its permission grants (the log shows "This process is not trusted"). Reset with `tccutil reset All com.jlgamez.sona` and add Sona again under Accessibility and Input Monitoring. Phase 5 removes this manual step.
 - Exit: closing the window keeps push-to-talk working, and quitting leaves no stray processes.
 
 ### Phase 5: Onboarding and permissions UI (`sona-ui`)
