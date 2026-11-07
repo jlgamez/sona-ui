@@ -1,6 +1,6 @@
 # 002: Critical UI fixes
 
-Status: planned. Scope is steps 1 and 2 of the order in `001-ui-electron-assessment.md`. Each item is a separate commit.
+Status: items 1 and 4 done; the rest planned. Scope is steps 1 and 2 of the order in `001-ui-electron-assessment.md`. Each item is a separate commit.
 
 Backend API (repo `sona`): `GET/POST /api/user-config`, `GET /api/models`, `GET /api/hot-keys`, `GET /api/audio-devices`, `POST /api/download-model?name=`, `GET /api/model-download-state?name=`, `POST /api/delete-model?name=`. Errors come back as `{"success": false, "error": "..."}` with a 4xx or 5xx status.
 
@@ -12,7 +12,7 @@ Changes:
 - Add an `ApiError` class (status, message). `get` and `post` throw it when `!response.ok`, using `error` from the body when present.
 - Make `downloadModel`, `deleteModel` and `saveUserConfig` return their promises.
 - Remove the `console.log` in `buildUrlWith`.
-- Move `BASE_URL` behind a `getApiBaseUrl()` that reads `window.sona?.apiBaseUrl` (set by the future Electron preload) and falls back to `import.meta.env.VITE_API_BASE_URL`, then to `http://127.0.0.1:5000`.
+- `BASE_URL` reads `import.meta.env.VITE_API_BASE_URL` and falls back to `http://127.0.0.1:5000`. The runtime hook for Electron (a preload script exposing the URL) is deferred until the Electron shell exists.
 
 Done when: a 400 or 500 from any call rejects with a readable message.
 
@@ -49,8 +49,8 @@ Problem: both toggles are stored by the backend but not used, so they do nothing
 
 Changes:
 - Extend `ToggleSetting` with a `comingSoon?: boolean` prop. When set, the switch is disabled and not focusable as an action, and a "Coming soon" badge sits next to the name. The disabled state keeps `aria-disabled` and the badge text is read by screen readers.
-- Pass `comingSoon` in `IntelligentModeSection` and `TextSelectionAwarenessSection`. Show the stored value as off in the UI.
-- Do not send a changed value from these toggles. Keep sending the loaded values in the save payload so the backend config is not altered.
+- `IntelligentModeSection` and `TextSelectionAwarenessSection` become stateless and pass `comingSoon`. They no longer read the stores, and the switches display off.
+- The stores stay, so the values loaded from the backend are still sent unchanged on Save and the backend config is not altered.
 - Remove the line "Disabled when in Intelligent Mode" from the Autonomous pasting description in `ClipboardBehaviourSection`, since the interaction does not exist.
 - Fix the typo in the Keep output description ("Sona will the latest output" should read "Sona will keep the latest output").
 

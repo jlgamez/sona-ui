@@ -7,6 +7,7 @@ type ToggleSettingProps = {
   description?: string | React.ReactNode;
   onChange?: (checked: boolean) => void;
   enabled?: boolean;
+  comingSoon?: boolean;
   defaultChecked?: boolean;
   checked?: boolean;
 };
@@ -17,12 +18,14 @@ export const ToggleSetting = (props: ToggleSettingProps) => {
     description,
     onChange,
     enabled = true,
+    comingSoon = false,
     defaultChecked = false,
     checked,
   } = props;
 
-  const textOpacity = enabled ? 1 : 0.5;
-  const switchOpacity = enabled ? 1 : 0.9;
+  const isEnabled = enabled && !comingSoon;
+  const textOpacity = isEnabled ? 1 : 0.5;
+  const switchOpacity = isEnabled ? 1 : 0.9;
   return (
     <Stack direction={"column"}>
       <Stack direction="row" spacing={12} align="start">
@@ -33,10 +36,15 @@ export const ToggleSetting = (props: ToggleSettingProps) => {
           style={{ opacity: textOpacity }}
         >
           {name}
+          {comingSoon && (
+            <span className="ml-2 rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+              Coming soon
+            </span>
+          )}
         </Text>
         <Switch
           onCheckedChange={onChange}
-          disabled={!enabled}
+          disabled={!isEnabled}
           style={{ opacity: switchOpacity }}
           defaultChecked={defaultChecked}
           checked={checked}
