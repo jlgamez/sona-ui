@@ -1,5 +1,6 @@
 import { Settings } from "@/ui/settings/Settings.tsx";
 import { Welcome } from "@/ui/welcome/Welcome.tsx";
+import { Onboarding } from "@/ui/onboarding/Onboarding.tsx";
 import DesktopLayout from "@/common-components/DesktopLayout.tsx";
 import { useState } from "react";
 import { useLoadSettings } from "@/ui/settings/hooks/useLoadSettings.ts";
@@ -58,6 +59,14 @@ function App() {
           <Spinner />
           {status === "retrying" && <Text tone="muted">Starting Sona...</Text>}
         </Stack>
+      ) : !config.onboarding_completed ? (
+        <Onboarding
+          savedConfig={config}
+          onSavedConfigChange={(saved) => {
+            setConfig(saved);
+            if (saved.onboarding_completed) setCurrentPage("settings");
+          }}
+        />
       ) : (
         <motion.div
           key={currentPage}

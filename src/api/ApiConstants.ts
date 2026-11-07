@@ -14,6 +14,9 @@ export const ENDPOINT = {
   DELETE_MODEL: "delete-model",
   HOT_KEYS: "hot-keys",
   AUDIO_DEVICES: "audio-devices",
+  PERMISSIONS: "permissions",
+  REQUEST_INPUT_MONITORING: "permissions/request-input-monitoring",
+  RELOAD_RUNTIME: "runtime/reload",
 } as const;
 
 export type ENDPOINT = (typeof ENDPOINT)[keyof typeof ENDPOINT];

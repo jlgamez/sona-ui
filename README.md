@@ -34,13 +34,15 @@ Open it from Finder. Sona lives in the menu bar (no Dock icon): closing the wind
 
 macOS asks for these per app. In dev they belong to the terminal you run `npm run dev` from; in the packaged app they belong to `Sona.app`.
 
-| Permission | Needed for | How |
-|---|---|---|
-| Microphone | recording | prompts on the first hotkey press: click Allow |
-| Input Monitoring | hearing the hotkey | System Settings > Privacy & Security > Input Monitoring: click `+`, add Sona |
-| Accessibility | pasting the text | same, under Accessibility |
+| Permission | Needed for |
+|---|---|
+| Microphone | recording |
+| Input Monitoring | hearing the hotkey |
+| Accessibility | pasting the text |
 
-After granting Accessibility or Input Monitoring, quit and reopen Sona. If the backend log says `This process is not trusted`, a grant is missing.
+On first launch Sona opens a setup wizard (permissions, speech model, hotkey, test). Each permission row shows its live state and either shows the macOS prompt or opens the right System Settings pane. No restart is needed after granting.
+
+The wizard runs when `onboarding_completed` is false in `~/.sona/user_config.json`. A config file saved before that field existed counts as completed. To see the wizard again, set the field to `false` or delete the file.
 
 Rebuilding the app changes its signature and macOS then ignores the old grants (the switch still looks on). Fix: `tccutil reset All com.jlgamez.sona`, reopen Sona and grant them again. A stable Developer ID signature will end this (plan 003, phase 6).
 

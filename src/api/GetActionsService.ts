@@ -13,6 +13,14 @@ export const fetchHotKeys = () =>
 export const fetchAudioDevices = () =>
   get<AudioDevice[]>(buildUrlWith(ENDPOINT.AUDIO_DEVICES));
 
+export type BackendPermissions = {
+  input_monitoring: "granted" | "denied" | "unknown";
+  accessibility: "granted" | "denied" | "unknown";
+};
+
+export const fetchPermissions = () =>
+  get<BackendPermissions>(buildUrlWith(ENDPOINT.PERMISSIONS));
+
 export const fetchUserConfig = () =>
   get<UserConfig>(buildUrlWith(ENDPOINT.USER_CONFIG));
 

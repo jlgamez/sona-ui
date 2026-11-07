@@ -4,6 +4,7 @@ import { existsSync } from "node:fs";
 import { createServer } from "node:net";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { registerPermissionHandlers } from "./permissions";
 import { createTray } from "./tray";
 
 const READY_TIMEOUT_MS = 90_000;
@@ -145,6 +146,7 @@ async function main(): Promise<void> {
   });
   await app.whenReady();
   app.dock?.hide();
+  registerPermissionHandlers();
   try {
     backendPort = await getFreePort();
     backend = startBackend(backendPort);

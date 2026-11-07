@@ -12,6 +12,12 @@ export const deleteModel = (modelName: string) => {
   return post(url, { name: modelName });
 };
 
+export const requestInputMonitoring = () =>
+  post(buildUrlWith(ENDPOINT.REQUEST_INPUT_MONITORING));
+
+/** Restarts the hotkey listener so a newly granted permission takes effect. */
+export const reloadRuntime = () => post(buildUrlWith(ENDPOINT.RELOAD_RUNTIME));
+
 export const saveUserConfig = (config: UserConfig) => {
   const url = buildUrlWith(ENDPOINT.USER_CONFIG);
   return post(url, undefined, config);
