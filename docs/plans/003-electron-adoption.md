@@ -39,7 +39,7 @@ resources/                backend binary (copied from the sona build output)
 
 The order is deliberate. Phases 1 to 3 prove the risky parts first (the frozen backend and the macOS permissions). Behaviour and UI polish come after that. Each phase ends with an exit check that must pass before the next one starts.
 
-### Phase 0: Finish the UI baseline (`sona-ui`)
+### Phase 0: Finish the UI baseline (`sona-ui`), done
 
 - Commit the pending work: item 5 of 002, `CLAUDE.md` and this plan.
 - Implement item 6 of 002: load error screen with retry and backoff, which also covers the backend startup delay.

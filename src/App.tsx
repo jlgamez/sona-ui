@@ -1,35 +1,17 @@
 import { Settings } from "@/ui/settings/Settings.tsx";
 import { Welcome } from "@/ui/welcome/Welcome.tsx";
 import DesktopLayout from "@/common-components/DesktopLayout.tsx";
-import { useEffect, useState } from "react";
-import { useModelsStore } from "@/ui/settings/store/ModelsStore.ts";
-import { useFetchAvailableModels } from "@/ui/settings/hooks/useFetchAvailableModels.tsx";
-import { useFetchUserConfig } from "@/ui/settings/hooks/useFetchUserConfig.tsx";
+import { useState } from "react";
+import { useLoadSettings } from "@/ui/settings/hooks/useLoadSettings.ts";
+import { LoadError } from "@/ui/LoadError.tsx";
+import Stack from "@/common-components/Stack.tsx";
+import Text from "@/common-components/Text.tsx";
 import { Spinner } from "@/components/ui/spinner.tsx";
 import { motion } from "motion/react";
 import { Toaster } from "sonner";
 
 function App() {
-  const { initializeModels } = useModelsStore();
-  const {
-    loading: modelsLoading,
-    models,
-    error: modelsError,
-  } = useFetchAvailableModels();
-  const {
-    loading: configLoading,
-    config,
-    setConfig,
-    error: configError,
-  } = useFetchUserConfig();
-
-  useEffect(() => {
-    if (!modelsLoading && !modelsError) initializeModels(models);
-  }, [modelsLoading, modelsError]);
-
-  const isLoading =
-    modelsLoading || configLoading || models.length === 0 || !config;
-  const hasError = modelsError || configError;
+  const { status, config, setConfig, error, retry } = useLoadSettings();
   const [currentPage, setCurrentPage] = useState<"welcome" | "settings">(
     "welcome",
   );
@@ -48,14 +30,19 @@ function App() {
       className="p-6"
     >
       <Toaster />
-      {hasError ? (
-        <div className={"flex justify-center items-center h-screen w-full"}>
-          There was an error loading settings
-        </div>
-      ) : isLoading ? (
-        <div className={"flex justify-center items-center h-screen w-full"}>
+      {status === "error" ? (
+        <LoadError message={error} onRetry={retry} />
+      ) : status !== "ready" || !config ? (
+        <Stack
+          direction="column"
+          spacing={3}
+          align="center"
+          justify="center"
+          className="h-screen w-full"
+        >
           <Spinner />
-        </div>
+          {status === "retrying" && <Text tone="muted">Starting Sona...</Text>}
+        </Stack>
       ) : (
         <motion.div
           key={currentPage}

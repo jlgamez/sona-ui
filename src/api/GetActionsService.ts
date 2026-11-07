@@ -4,6 +4,7 @@ import type {
   AudioDevice,
   HotKeyOption,
   UserConfig,
+  WhisperModel,
 } from "@/ui/settings/types/SettingsTypes.ts";
 
 export const fetchHotKeys = () =>
@@ -14,3 +15,23 @@ export const fetchAudioDevices = () =>
 
 export const fetchUserConfig = () =>
   get<UserConfig>(buildUrlWith(ENDPOINT.USER_CONFIG));
+
+type ApiModel = {
+  name: string;
+  required_ram: string;
+  relative_speed: string;
+  in_system: boolean;
+  english_only: boolean;
+};
+
+export const fetchModels = async (): Promise<WhisperModel[]> => {
+  const models = await get<ApiModel[]>(buildUrlWith(ENDPOINT.MODELS));
+  return models.map((m) => ({
+    name: m.name,
+    requiredRam: m.required_ram,
+    relativeSpeed: m.relative_speed,
+    inSystem: m.in_system,
+    englishOnly: m.english_only,
+    isDownloading: false,
+  }));
+};

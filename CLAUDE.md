@@ -16,7 +16,7 @@
 | Path | Purpose |
 |------|---------|
 | `src/api/` | `FetchUtils` (get/post, `ApiError`, `describeError`), endpoint constants, `GetActionsService`, `PostActionsService` |
-| `src/ui/settings/` | Settings screen: `sections/`, `components/`, `hooks/`, `store/`, `types/`, plus `applyConfigToStores` and `modelActions`. Hotkey and microphone lists load with `useFetchData` |
+| `src/ui/settings/` | Settings screen: `sections/`, `components/`, `hooks/`, `store/`, `types/`, plus `applyConfigToStores` and `modelActions`. `useLoadSettings` loads models and config with retry on startup. Hotkey and microphone lists load with `useFetchData` |
 | `src/ui/welcome/` | Welcome screen |
 | `src/common-components/` | Shared building blocks (`Stack`, `Text`, `DropDown`, buttons) |
 | `src/components/ui/` | shadcn primitives. Generated style, rarely edited |
@@ -50,7 +50,6 @@ Types: `feat fix refactor perf docs style test chore`. Scopes: `settings models 
 
 ## Known Gaps
 
-- Open plan item: retry and error screen on load failure (item 6)
 - The backend silently falls back to Control (Left) for an unknown `hot_key`; it should reject it with a 400
 - Not built yet: onboarding and permissions flow, recording status, Electron shell, tests
 - Existing lint errors in `Text.tsx` and `button.tsx`, and an exhaustive-deps warning in `App.tsx`
