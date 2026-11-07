@@ -9,6 +9,27 @@ import Text from "@/common-components/Text.tsx";
 import { Spinner } from "@/components/ui/spinner.tsx";
 import { motion } from "motion/react";
 import { Toaster } from "sonner";
+import type { ReactNode } from "react";
+
+// Inside Electron the real window is the frame; the faux window is for browser dev only.
+const IN_ELECTRON = window.sona !== undefined;
+
+function Frame({ children }: { children: ReactNode }) {
+  if (IN_ELECTRON) {
+    return <div className="h-screen overflow-y-auto p-6">{children}</div>;
+  }
+  return (
+    <DesktopLayout
+      maxWidth={1200}
+      heightMode="viewport"
+      withChrome
+      devOnly={false}
+      className="p-6"
+    >
+      {children}
+    </DesktopLayout>
+  );
+}
 
 function App() {
   const { status, config, setConfig, error, retry } = useLoadSettings();
@@ -22,13 +43,7 @@ function App() {
   };
 
   return (
-    <DesktopLayout
-      maxWidth={1200}
-      heightMode="viewport"
-      withChrome
-      devOnly={false}
-      className="p-6"
-    >
+    <Frame>
       <Toaster />
       {status === "error" ? (
         <LoadError message={error} onRetry={retry} />
@@ -63,7 +78,7 @@ function App() {
           )}
         </motion.div>
       )}
-    </DesktopLayout>
+    </Frame>
   );
 }
 
