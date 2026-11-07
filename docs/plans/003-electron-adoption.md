@@ -53,12 +53,13 @@ The order is deliberate. Phases 1 to 3 prove the risky parts first (the frozen b
 - Confirm a cheap readiness check exists (`GET /api/models` can serve as one).
 - Exit: `./sona-backend --port 5055` serves the API and records and transcribes on a Mac without the dev environment.
 
-### Phase 2: Electron shell, unsigned (`sona-ui`)
+### Phase 2: Electron shell, unsigned (`sona-ui`), done
 
 - Add `electron-vite`, `electron/main.ts` and `electron/preload.ts`.
 - In dev, load the Vite dev server. In production, load the built files.
 - Main spawns the backend on a free port, polls until it is ready, then opens the window.
 - The preload script passes the port to the renderer. `ApiConstants.BASE_URL` reads it and falls back to `VITE_API_BASE_URL` for plain browser development.
+- Main waits up to 90 s for readiness (a cold backend start takes about 24 s), so the window opens only when the API answers.
 - Exit: one command opens the settings window with the backend started and stopped automatically.
 
 ### Phase 3: Signed build and permissions (risk gate)

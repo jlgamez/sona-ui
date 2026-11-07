@@ -2,11 +2,12 @@
 
 ## Overview
 
-**sona-ui** is the settings front end for Sona, a macOS push-to-talk speech-to-text app. The backend (separate repo `sona`, Flask) records audio, transcribes it with local Whisper and pastes the text. This UI configures it over HTTP and will be packaged with Electron later. Stack: Vite, React 19, TypeScript, Tailwind 4, Zustand, shadcn/Radix components, sonner for toasts.
+**sona-ui** is the settings front end for Sona, a macOS push-to-talk speech-to-text app. The backend (separate repo `sona`, Flask) records audio, transcribes it with local Whisper and pastes the text. This UI configures it over HTTP and runs inside an Electron shell (`electron/`) that starts and stops the backend. Stack: Vite, React 19, TypeScript, Tailwind 4, Zustand, shadcn/Radix components, sonner for toasts.
 
 ## Quick Reference
 
-- **Install and run:** `npm install`, then `npm run dev` (Vite, default port 5173)
+- **Install and run:** `npm install`, then `npm run dev` (Electron; main spawns the backend from `../sona/dist/sona-backend/`, override with `SONA_BACKEND_PATH`). `npm run dev:web` is plain Vite (port 5173) against a backend you start yourself; `npm run start` previews the production build
+- **Backend URL:** the preload script exposes `window.sona.apiBaseUrl` (free port chosen by main); `ApiConstants.BASE_URL` falls back to `VITE_API_BASE_URL`, then port 5000
 - **Check:** `npm run build` (runs `tsc -b`) and `npm run lint`. There are no tests yet
 - **Backend URL:** `VITE_API_BASE_URL`, default `http://127.0.0.1:5000`. Start the backend with `python run.py` (or `--port N`) in the `sona` repo. Port 5000 can clash with macOS AirPlay Receiver
 - **Plans:** `docs/plans/` holds the assessment (001) and the UI fix plan (002) with status
