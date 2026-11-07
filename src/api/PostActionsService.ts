@@ -3,12 +3,12 @@ import { ENDPOINT } from "@/api/ApiConstants.ts";
 
 export const downloadModel = (modelName: string) => {
   const url = buildUrlWith(ENDPOINT.DOWNLOAD_MODEL);
-  post(url, { name: modelName });
+  return post(url, { name: modelName });
 };
 
 export const deleteModel = (modelName: string) => {
   const url = buildUrlWith(ENDPOINT.DELETE_MODEL);
-  post(url, { name: modelName });
+  return post(url, { name: modelName });
 };
 
 export type UserConfigPayload = {
@@ -24,5 +24,5 @@ export type UserConfigPayload = {
 
 export const saveUserConfig = (config: UserConfigPayload) => {
   const url = buildUrlWith(ENDPOINT.USER_CONFIG);
-  post(url, undefined, config);
+  return post(url, undefined, config);
 };
