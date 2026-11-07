@@ -1,6 +1,6 @@
 # 002: Critical UI fixes
 
-Status: items 1 to 4 done; items 5 and 6 planned. Scope is steps 1 and 2 of the order in `001-ui-electron-assessment.md`. Each item is a separate commit.
+Status: items 1 to 5 done; item 6 planned. Scope is steps 1 and 2 of the order in `001-ui-electron-assessment.md`. Each item is a separate commit.
 
 Backend API (repo `sona`): `GET/POST /api/user-config`, `GET /api/models`, `GET /api/hot-keys`, `GET /api/audio-devices`, `POST /api/download-model?name=`, `GET /api/model-download-state?name=`, `POST /api/delete-model?name=`. Errors come back as `{"success": false, "error": "..."}` with a 4xx or 5xx status.
 
@@ -60,15 +60,16 @@ Done when: both toggles are visibly disabled with a badge and cannot be changed.
 
 ## 5. Microphone picker and hotkeys from the API
 
-Changes:
-- Add `AUDIO_DEVICES: "audio-devices"` and a `useFetchAudioDevices` hook (same shape as the existing fetch hooks). Response: `[{ "index": number, "name": string }]`.
-- New `MicrophoneSection` in Settings, placed first or after the hotkey. Uses `DropDown` with a "System default" first option (maps to `mic_device: null`) followed by device names. Store the choice in the draft.
-- A refresh icon button re-fetches the list. It has an `aria-label` of "Refresh microphones".
-- If the saved `mic_device` is not in the list, show it in the dropdown as "<name> (not connected)" and a helper line "Sona is using the system default microphone." Do not clear it from the config.
-- Empty list (non-macOS or ffmpeg failure): show "No microphones found. Using system default." and disable the dropdown.
-- Hotkeys: replace the hardcoded `AVAILABLE_HOT_KEYS` with `GET /api/hot-keys`. First check the response shape and keep the display-name mapping only if the API does not return display names.
+Done (see `MicrophoneSection.tsx`, `HotKeySelectionSection.tsx`, `useFetchData.ts`, `MicStore.ts`):
+- Microphone section after the hotkey: "System default" (saved as `mic_device: null`) plus the devices from `GET /api/audio-devices`, and a refresh button (`aria-label` "Refresh microphones"). A saved mic that is not in the list is shown as "<name> (not connected)" with the hint "Sona is using the system default microphone." and is kept in the config. An empty list shows "No microphones found. Using system default." If the request fails, only "System default" and the saved value are shown. The dropdown is not disabled in these cases.
+- Hotkeys come from `GET /api/hot-keys` (`name`, `display_name`, `is_default`). The hardcoded lists and key maps are gone.
+- `DropDown` options are now `{ value, label }`, and long labels are truncated.
 
-Done when: choosing a microphone and saving persists `mic_device`; an unplugged saved device shows the not-connected hint; the hotkey list comes from the backend.
+Bug found and fixed: the old UI mapped "cmd + ctrl" to `cmd_ctrl`, but the backend expects `cmd+ctrl`. The backend silently falls back to Control (Left) for unknown names, so "Command + Control" never worked. A config already saved as `cmd_ctrl` is shown as the default key (as the backend treats it) and is only corrected when the user picks a key and saves.
+
+Follow-up for the backend repo: reject an unknown `hot_key` with a 400 instead of silently using the default.
+
+Checked against a stub backend: hotkey saved as `cmd+ctrl`, mic chosen and saved, unplugged mic with hint, "System default" saved as null, refresh picks up a new device, empty list, failing endpoint, legacy `cmd_ctrl`, and the Current Model dropdown after the `DropDown` change.
 
 ## 6. Load errors and backend startup
 

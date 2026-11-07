@@ -6,6 +6,7 @@ import { CurrentModelSection } from "@/ui/settings/sections/current-model/Curren
 import { ClipboardBehaviourSection } from "@/ui/settings/sections/clipboard/ClipboardBehaviourSection.tsx";
 import { IntelligentModeSection } from "@/ui/settings/sections/intelligent-mode/IntelligentModeSection.tsx";
 import { HotKeySelectionSection } from "@/ui/settings/sections/hot-key/HotKeySelectionSection.tsx";
+import { MicrophoneSection } from "@/ui/settings/sections/microphone/MicrophoneSection.tsx";
 import { SaveCancelAction } from "@/ui/settings/sections/save-cancel-action/SaveCancelAction.tsx";
 import { TextSelectionAwarenessSection } from "@/ui/settings/sections/text-selection-awareness/TextSelectionAwarenessSection.tsx";
 import type { UserConfig } from "@/ui/settings/types/SettingsTypes.ts";
@@ -35,6 +36,8 @@ export const Settings = ({
         className={"pl-7 pr-7 pt-5 pb-10"}
       >
         <HotKeySelectionSection />
+        <Separator />
+        <MicrophoneSection />
         <Separator />
         <IntelligentModeSection />
         <Separator />

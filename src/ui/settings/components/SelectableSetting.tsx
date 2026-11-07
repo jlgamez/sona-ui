@@ -1,10 +1,12 @@
 import Text from "@/common-components/Text.tsx";
-import DropDown from "@/common-components/DropDown.tsx";
+import DropDown, {
+  type DropDownOption,
+} from "@/common-components/DropDown.tsx";
 import Stack from "@/common-components/Stack.tsx";
 
 type Props = {
   name: string;
-  options: string[];
+  options: DropDownOption[];
   value?: string | null;
   placeholder?: string;
   onChange?: (value: string) => void;

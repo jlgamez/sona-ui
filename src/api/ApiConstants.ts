@@ -10,6 +10,7 @@ export const ENDPOINT = {
   DOWNLOAD_MODEL: "download-model",
   DELETE_MODEL: "delete-model",
   HOT_KEYS: "hot-keys",
+  AUDIO_DEVICES: "audio-devices",
 } as const;
 
 export type ENDPOINT = (typeof ENDPOINT)[keyof typeof ENDPOINT];

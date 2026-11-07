@@ -7,7 +7,10 @@ import { startModelDownload } from "@/ui/settings/modelActions.ts";
 
 export const CurrentModelSection = () => {
   const { getModels, getModel, setCurrentModelName } = useModelsStore();
-  const models = Array.from(getModels().keys());
+  const models = Array.from(getModels().keys(), (name) => ({
+    value: name,
+    label: name,
+  }));
   const currentModelName = useModelsStore((state) => state.currentModelName);
 
   // Subscribe to store's downloading state for the selected model
