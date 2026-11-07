@@ -1,5 +1,6 @@
 import { buildUrlWith, post } from "@/api/FetchUtils.ts";
 import { ENDPOINT } from "@/api/ApiConstants.ts";
+import type { UserConfig } from "@/ui/settings/types/SettingsTypes.ts";
 
 export const downloadModel = (modelName: string) => {
   const url = buildUrlWith(ENDPOINT.DOWNLOAD_MODEL);
@@ -11,18 +12,7 @@ export const deleteModel = (modelName: string) => {
   return post(url, { name: modelName });
 };
 
-export type UserConfigPayload = {
-  clipboard_behaviour: {
-    autonomous_pasting: boolean;
-    keep_output_in_clipboard: boolean;
-  };
-  current_model: string;
-  hot_key: string;
-  intelligent_mode: boolean;
-  text_selection_awareness: boolean;
-};
-
-export const saveUserConfig = (config: UserConfigPayload) => {
+export const saveUserConfig = (config: UserConfig) => {
   const url = buildUrlWith(ENDPOINT.USER_CONFIG);
   return post(url, undefined, config);
 };

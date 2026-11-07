@@ -14,6 +14,7 @@ export type UserConfig = {
   };
   current_model: string;
   hot_key: string;
+  mic_device: string | null;
   intelligent_mode: boolean;
   text_selection_awareness: boolean;
 };

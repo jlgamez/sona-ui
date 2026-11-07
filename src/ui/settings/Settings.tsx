@@ -8,12 +8,15 @@ import { IntelligentModeSection } from "@/ui/settings/sections/intelligent-mode/
 import { HotKeySelectionSection } from "@/ui/settings/sections/hot-key/HotKeySelectionSection.tsx";
 import { SaveCancelAction } from "@/ui/settings/sections/save-cancel-action/SaveCancelAction.tsx";
 import { TextSelectionAwarenessSection } from "@/ui/settings/sections/text-selection-awareness/TextSelectionAwarenessSection.tsx";
+import type { UserConfig } from "@/ui/settings/types/SettingsTypes.ts";
 
 type SettingsProps = {
+  savedConfig: UserConfig;
+  onSaved: (config: UserConfig) => void;
   onClose?: () => void;
 };
 
-export const Settings = ({ onClose }: SettingsProps) => {
+export const Settings = ({ savedConfig, onSaved, onClose }: SettingsProps) => {
   return (
     <div className={"relative h-full w-full"}>
       <div className={"pl-5 pr-5 min-w-full mb-4"}>
@@ -38,7 +41,11 @@ export const Settings = ({ onClose }: SettingsProps) => {
         <CurrentModelSection />
         <Separator />
         <AvailableModelsSection />
-        <SaveCancelAction onClose={onClose} />
+        <SaveCancelAction
+          savedConfig={savedConfig}
+          onSaved={onSaved}
+          onClose={onClose}
+        />
       </Stack>
     </div>
   );

@@ -21,5 +21,5 @@ export function useFetchUserConfig() {
       });
   }, []);
 
-  return { config, loading, error };
+  return { config, setConfig, loading, error };
 }

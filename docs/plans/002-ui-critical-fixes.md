@@ -1,6 +1,6 @@
 # 002: Critical UI fixes
 
-Status: items 1 and 4 done; the rest planned. Scope is steps 1 and 2 of the order in `001-ui-electron-assessment.md`. Each item is a separate commit.
+Status: items 1, 2 and 4 done; the rest planned. Scope is steps 1 and 2 of the order in `001-ui-electron-assessment.md`. Each item is a separate commit.
 
 Backend API (repo `sona`): `GET/POST /api/user-config`, `GET /api/models`, `GET /api/hot-keys`, `GET /api/audio-devices`, `POST /api/download-model?name=`, `GET /api/model-download-state?name=`, `POST /api/delete-model?name=`. Errors come back as `{"success": false, "error": "..."}` with a 4xx or 5xx status.
 
@@ -20,15 +20,16 @@ Done when: a 400 or 500 from any call rejects with a readable message.
 
 Problems: Cancel keeps edited store values (bug 2), Save closes immediately and ignores failures (bug 3), the payload lacks `mic_device` (bug 1).
 
-Changes:
-- Add a settings draft layer. On entering Settings, snapshot the stores. Cancel restores the snapshot. A simple way: add a `resetTo(snapshot)` action per store, or move the settings state into one `SettingsDraftStore` with `load(config)`, `draft` and `isDirty`.
-- Save awaits `saveUserConfig`. While pending, the Save button shows a spinner and is disabled. On success, show a "Settings saved" toast and close. On failure, show an error toast and stay on the screen with the draft intact.
-- Disable Save when `isDirty` is false.
-- Include `mic_device` in the payload (see item 5). Until the picker lands, carry through the value loaded from the config so a save never resets it.
-- Add `mic_device: string | null` to `UserConfig` and `UserConfigPayload`.
-- Add a toast component. Use shadcn `sonner`, or a small custom one if a new dependency is not wanted. Toasts use `role="status"`, auto-dismiss after about 4 seconds and have a close button.
+Done (see `useDraftConfig.ts`, `applyConfigToStores.ts`, `SaveCancelAction.tsx`):
+- The saved config from `GET /api/user-config` is the baseline, held in `App.tsx`. The draft is the saved config with the edited store values on top (`useDraftConfig`). Fields the UI does not edit, such as `mic_device`, are carried over, so Save never resets them. There is no separate draft store.
+- Cancel calls `applyConfigToStores(savedConfig)` to restore the stores, then closes.
+- Save awaits `saveUserConfig`, shows a spinner and is disabled while saving or when nothing changed. On success it updates the saved config, shows a "Settings saved" toast (sonner) and closes. On failure it shows an error toast with the backend message and stays open with the draft intact.
+- The Intelligent Mode and Text Selection Awareness stores were removed, since their values now come from the saved config. Bring stores back when those features exist.
+- `UserConfig` has `mic_device: string | null`; the duplicate `UserConfigPayload` type was removed.
 
-Done when: editing a toggle, pressing Cancel and reopening Settings shows the saved value; a failed save keeps the screen open with an error toast; a successful save toasts and closes.
+Known limit: choosing a model that is not downloaded starts its download immediately, and Cancel does not stop it. That belongs to item 3.
+
+Checked against a stub backend: Save disabled until a change, Cancel reverts, failed save keeps the screen open with the error toast, successful save toasts and persists, and the request body keeps `mic_device`.
 
 ## 3. Model deletion and download
 
