@@ -6,6 +6,48 @@ The UI focuses on configuring how the assistant behaves (models, intelligent mod
 
 ---
 
+## Running Sona
+
+Sona is an Electron app (`electron/`) that starts the Python backend (repo `sona`, sibling folder) and shows this UI. It needs macOS and the backend built once: in `../sona` run `pyinstaller Sona.spec --noconfirm` (Python 3.14 venv), which creates `dist/sona-backend/`.
+
+### Development
+
+```bash
+npm install
+npm run dev        # Electron window + hot reload; starts ../sona/dist/sona-backend on a free port
+```
+
+- Other backend binary: `SONA_BACKEND_PATH=/path/to/sona-backend npm run dev`.
+- Browser only (no Electron): start a backend yourself, then `VITE_API_BASE_URL=http://127.0.0.1:5000 npm run dev:web`.
+- Backend logs show in the terminal with a `[backend]` prefix. The first start takes about 25 s.
+
+### Packaged app
+
+```bash
+npm run backend:copy && npm run pack    # builds release/mac-arm64/Sona.app (ad-hoc signed)
+cp -R release/mac-arm64/Sona.app /Applications/
+```
+
+Open it from Finder. Sona lives in the menu bar (no Dock icon): closing the window hides it, and **Quit Sona** in the menu bar icon stops it and the backend. The menu also has a "Start at login" option.
+
+### Permissions
+
+macOS asks for these per app. In dev they belong to the terminal you run `npm run dev` from; in the packaged app they belong to `Sona.app`.
+
+| Permission | Needed for | How |
+|---|---|---|
+| Microphone | recording | prompts on the first hotkey press: click Allow |
+| Input Monitoring | hearing the hotkey | System Settings > Privacy & Security > Input Monitoring: click `+`, add Sona |
+| Accessibility | pasting the text | same, under Accessibility |
+
+After granting Accessibility or Input Monitoring, quit and reopen Sona. If the backend log says `This process is not trusted`, a grant is missing.
+
+Rebuilding the app changes its signature and macOS then ignores the old grants (the switch still looks on). Fix: `tccutil reset All com.jlgamez.sona`, reopen Sona and grant them again. A stable Developer ID signature will end this (plan 003, phase 6).
+
+Plan and status: `docs/plans/003-electron-adoption.md`.
+
+---
+
 ## Features
 
 - **Centralized Settings Screen**
