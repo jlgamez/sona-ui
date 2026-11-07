@@ -1,0 +1,24 @@
+appId: com.jlgamez.sona
+productName: Sona
+directories:
+  output: release
+files:
+  - out/**
+  - package.json
+extraResources:
+  - from: build
+    to: tray
+    filter:
+      - trayTemplate*.png
+  - from: resources/sona-backend
+    to: sona-backend
+mac:
+  target: dir
+  category: public.app-category.productivity
+  icon: build/icon.icns
+  identity: "-"
+  entitlements: build/entitlements.mac.plist
+  entitlementsInherit: build/entitlements.mac.plist
+  extendInfo:
+    LSUIElement: true
+    NSMicrophoneUsageDescription: Sona records your voice to transcribe it.

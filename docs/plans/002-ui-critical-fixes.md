@@ -1,6 +1,6 @@
 # 002: Critical UI fixes
 
-Status: items 1 to 5 done; item 6 planned. Scope is steps 1 and 2 of the order in `001-ui-electron-assessment.md`. Each item is a separate commit.
+Status: items 1 to 6 done. Scope is steps 1 and 2 of the order in `001-ui-electron-assessment.md`. Each item is a separate commit.
 
 Backend API (repo `sona`): `GET/POST /api/user-config`, `GET /api/models`, `GET /api/hot-keys`, `GET /api/audio-devices`, `POST /api/download-model?name=`, `GET /api/model-download-state?name=`, `POST /api/delete-model?name=`. Errors come back as `{"success": false, "error": "..."}` with a 4xx or 5xx status.
 
@@ -73,13 +73,17 @@ Checked against a stub backend: hotkey saved as `cmd+ctrl`, mic chosen and saved
 
 ## 6. Load errors and backend startup
 
-Problem: any failed fetch shows the permanent text "There was an error loading settings" (`App.tsx`). In Electron the backend can take several seconds to be ready.
+Problem: any failed fetch showed the permanent text "There was an error loading settings" (`App.tsx`). In Electron the backend can take several seconds to be ready.
 
-Changes:
-- Replace the message with an error state: heading, short explanation, "Try again" button. While the first load fails, retry automatically with backoff (1s, 2s, 4s, up to 5 attempts), showing "Starting Sona..." with a spinner. After the attempts are exhausted, show the error state with the button.
-- Do not require `models.length === 0` as a loading condition. An empty models list is a real error state with its own message.
+Done (see `useLoadSettings.ts`, `LoadError.tsx`, `App.tsx`):
+- `useLoadSettings` replaces the two load hooks. It loads the models and the saved config together and applies them to the stores once on success. If a load fails it retries after 1s, 2s, 4s and 8s (five attempts in total) and the screen shows a spinner with "Starting Sona...".
+- When the attempts run out, `LoadError` shows the reason and a "Try again" button, which starts the cycle again.
+- An empty models list is an error ("Sona returned no models") and no longer an endless spinner.
+- `fetchModels` in `GetActionsService.ts` now holds the model mapping.
 
-Done when: starting the UI before the backend and then starting the backend recovers without a reload.
+Not included: detecting that the backend died after a successful load. That belongs with the Electron main process.
+
+Checked against a stub backend: UI started before the backend recovers on its own, the error screen after the attempts run out and recovery through "Try again", an empty models list, a 500 from the config endpoint, and a normal load into Settings.
 
 ## Out of scope
 

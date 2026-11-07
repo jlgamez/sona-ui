@@ -28,4 +28,5 @@ export type UserConfig = {
   mic_device: string | null;
   intelligent_mode: boolean;
   text_selection_awareness: boolean;
+  onboarding_completed: boolean;
 };
