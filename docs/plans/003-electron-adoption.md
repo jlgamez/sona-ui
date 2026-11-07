@@ -82,14 +82,16 @@ The order is deliberate. Phases 1 to 3 prove the risky parts first (the frozen b
 - A rebuilt, re-signed app loses its permission grants (the log shows "This process is not trusted"). Reset with `tccutil reset All com.jlgamez.sona` and add Sona again under Accessibility and Input Monitoring. Phase 5 removes this manual step.
 - Exit: closing the window keeps push-to-talk working, and quitting leaves no stray processes.
 
-### Phase 5: Onboarding and permissions UI (`sona-ui`), implemented, packaged-build check pending
+### Phase 5: Onboarding and permissions UI (`sona-ui`), done with an ad-hoc signature
 
 - First-run flow that explains each permission, detects its state, and links to System Settings.
 - Model download during onboarding.
-- Result: a four-step wizard (permissions, model, hotkey, try it) shown while `onboarding_completed` is false in the backend config. Existing config files without the field count as completed.
+- Result: a wizard (welcome, permissions, model, hotkey, try it, done, with a Back button and a progress bar) shown while `onboarding_completed` is false in the backend config. Existing config files without the field count as completed.
   - Microphone: Electron `systemPreferences` over IPC. Accessibility: status from the backend (`AXIsProcessTrusted`), prompt from Electron (`isTrustedAccessibilityClient(true)`). Input Monitoring: backend `IOHIDCheckAccess` / `IOHIDRequestAccess` via ctypes (`GET /api/permissions`, `POST /api/permissions/request-input-monitoring`).
   - `POST /api/runtime/reload` restarts the hotkey listener once Accessibility and Input Monitoring are granted, so no app restart is needed.
-  - To verify on a packaged build: that backend and Electron agree on each grant, that the prompts register Sona in the lists. Reload itself is cheap: the model loads lazily on the first transcription.
+  - Reload is cheap: the model loads lazily on the first transcription.
+  - Run from the packaged `/Applications/Sona.app` (ad-hoc signature) from a clean state (`tccutil reset`, no config, no models) and accepted. Steps and motion respect macOS Reduce motion.
+  - Not yet re-checked with a Developer ID signature; phase 6 covers that.
 - Exit: a new user can go from install to the first transcription without reading documentation.
 
 ### Phase 6: Release
