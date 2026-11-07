@@ -1,4 +1,6 @@
-import type { ReactNode } from "react";
+import { Children, type ReactNode } from "react";
+import { ArrowRight } from "lucide-react";
+import { motion, type Variants } from "motion/react";
 import Stack from "@/common-components/Stack.tsx";
 import Text from "@/common-components/Text.tsx";
 import { Button } from "@/components/ui/button.tsx";
@@ -9,9 +11,20 @@ type StepLayoutProps = {
   children: ReactNode;
   canContinue: boolean;
   onContinue: () => void;
+  /** Text for the final step; without it the button is a round arrow. */
   continueLabel?: string;
   /** Shown as a quiet secondary button when the step can be skipped. */
   onSkip?: () => void;
+};
+
+// Same fade-up as the Welcome screen; children appear one after another.
+const container: Variants = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.1, delayChildren: 0.05 } },
+};
+const item: Variants = {
+  hidden: { opacity: 0, y: 16 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.45, ease: "easeOut" } },
 };
 
 export const StepLayout = ({
@@ -20,28 +33,54 @@ export const StepLayout = ({
   children,
   canContinue,
   onContinue,
-  continueLabel = "Continue",
+  continueLabel,
   onSkip,
 }: StepLayoutProps) => (
-  <Stack direction="column" spacing={6} className="mx-auto w-full max-w-xl">
-    <Stack direction="column" spacing={2}>
-      <Text as="h2" size="xl" weight="bold">
-        {title}
-      </Text>
-      <Text tone="muted">{description}</Text>
-    </Stack>
+  <motion.div
+    variants={container}
+    initial="hidden"
+    animate="show"
+    className="mx-auto flex w-full max-w-xl flex-col gap-6"
+  >
+    <motion.div variants={item}>
+      <Stack direction="column" spacing={2}>
+        <Text as="h2" size="xl" weight="bold">
+          {title}
+        </Text>
+        <Text tone="muted">{description}</Text>
+      </Stack>
+    </motion.div>
     <Stack direction="column" spacing={3}>
-      {children}
+      {Children.toArray(children).map((child, index) => (
+        <motion.div key={index} variants={item}>
+          {child}
+        </motion.div>
+      ))}
     </Stack>
-    <Stack direction="row" spacing={3} justify="end">
-      {onSkip && (
-        <Button variant="ghost" onClick={onSkip}>
-          Skip
-        </Button>
-      )}
-      <Button onClick={onContinue} disabled={!canContinue}>
-        {continueLabel}
-      </Button>
-    </Stack>
-  </Stack>
+    <motion.div variants={item}>
+      <Stack direction="row" spacing={3} justify="end">
+        {onSkip && (
+          <Button variant="ghost" onClick={onSkip}>
+            Skip
+          </Button>
+        )}
+        {continueLabel ? (
+          <Button onClick={onContinue} disabled={!canContinue}>
+            {continueLabel}
+            <ArrowRight className="ml-2 size-4" />
+          </Button>
+        ) : (
+          <Button
+            size="icon"
+            onClick={onContinue}
+            disabled={!canContinue}
+            aria-label="Continue"
+            className="group size-11 rounded-full shadow-sm transition-all disabled:opacity-30"
+          >
+            <ArrowRight className="size-5 transition-transform group-hover:translate-x-0.5" />
+          </Button>
+        )}
+      </Stack>
+    </motion.div>
+  </motion.div>
 );

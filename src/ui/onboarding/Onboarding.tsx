@@ -3,7 +3,9 @@ import { toast } from "sonner";
 import { describeError } from "@/api/FetchUtils.ts";
 import { fetchHotKeys } from "@/api/GetActionsService.ts";
 import { saveUserConfig } from "@/api/PostActionsService.ts";
-import Text from "@/common-components/Text.tsx";
+import { AnimatePresence, motion } from "motion/react";
+import { Welcome } from "@/ui/welcome/Welcome.tsx";
+import { ProgressSteps } from "@/ui/onboarding/ProgressSteps.tsx";
 import { HotkeyStep } from "@/ui/onboarding/HotkeyStep.tsx";
 import { ModelStep } from "@/ui/onboarding/ModelStep.tsx";
 import { PermissionsStep } from "@/ui/onboarding/PermissionsStep.tsx";
@@ -13,7 +15,7 @@ import { useDraftConfig } from "@/ui/settings/hooks/useDraftConfig.ts";
 import { useHotKeyStore } from "@/ui/settings/store/HotKeyStore.ts";
 import type { UserConfig } from "@/ui/settings/types/SettingsTypes.ts";
 
-const STEPS = ["permissions", "model", "hotkey", "try-it"] as const;
+const STEPS = ["welcome", "permissions", "model", "hotkey", "try-it"] as const;
 
 type OnboardingProps = {
   savedConfig: UserConfig;
@@ -62,22 +64,36 @@ export const Onboarding = ({
   const step = STEPS[stepIndex];
 
   return (
-    <div className="flex w-full flex-col gap-8 py-8">
-      <Text tone="muted" size="sm" align="center">
-        Step {stepIndex + 1} of {STEPS.length}
-      </Text>
-      {step === "permissions" && <PermissionsStep onContinue={next} />}
-      {step === "model" && <ModelStep onContinue={next} />}
-      {step === "hotkey" && (
-        <HotkeyStep saving={saving} onContinue={leaveHotkeyStep} />
+    <div className="flex min-h-full w-full flex-col gap-8 py-8">
+      {/* Welcome is step 0 and has no progress yet. */}
+      {stepIndex > 0 && (
+        <ProgressSteps total={STEPS.length - 1} current={stepIndex} />
       )}
-      {step === "try-it" && (
-        <TryItStep
-          hotKeyLabel={hotKeyLabel}
-          saving={saving}
-          onFinish={finish}
-        />
-      )}
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.div
+          key={step}
+          initial={{ opacity: 0, x: 35 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -35 }}
+          transition={{ duration: 0.3, ease: "easeOut" }}
+          className="my-auto w-full"
+        >
+          {/* Welcome's "navigate" button simply starts the wizard here. */}
+          {step === "welcome" && <Welcome onNavigateToSettings={next} />}
+          {step === "permissions" && <PermissionsStep onContinue={next} />}
+          {step === "model" && <ModelStep onContinue={next} />}
+          {step === "hotkey" && (
+            <HotkeyStep saving={saving} onContinue={leaveHotkeyStep} />
+          )}
+          {step === "try-it" && (
+            <TryItStep
+              hotKeyLabel={hotKeyLabel}
+              saving={saving}
+              onFinish={finish}
+            />
+          )}
+        </motion.div>
+      </AnimatePresence>
     </div>
   );
 };
