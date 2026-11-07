@@ -1,7 +1,7 @@
 {
   "name": "sona-ui",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
   "scripts": {
     "dev": "electron-vite dev",
@@ -11,7 +11,8 @@
     "lint": "eslint .",
     "prettier": "prettier --write .",
     "backend:copy": "bash scripts/copy-backend.sh",
-    "pack": "npm run build && electron-builder --dir"
+    "pack": "npm run build && electron-builder --dir",
+    "dist": "npm run backend:copy && npm run pack && bash scripts/make-zip.sh"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.15",

@@ -44,7 +44,29 @@ On first launch Sona opens a setup wizard (permissions, speech model, hotkey, te
 
 The wizard runs when `onboarding_completed` is false in `~/.sona/user_config.json`. A config file saved before that field existed counts as completed. To see the wizard again, set the field to `false` or delete the file.
 
-Rebuilding the app changes its signature and macOS then ignores the old grants (the switch still looks on). Fix: `tccutil reset All com.jlgamez.sona`, reopen Sona and grant them again. A stable Developer ID signature will end this (plan 003, phase 6).
+Rebuilding the app changes its signature and macOS then ignores the old grants (the switch still looks on). Fix: see "Updating" under "Sharing the app" below. There is no Developer ID signature, so this stays.
+
+### Sharing the app
+
+```bash
+npm run dist    # needs the PyInstaller backend built first; creates release/Sona-<version>-arm64.zip
+```
+
+Upload the zip to Drive. It is ad-hoc signed and not notarized (no Apple Developer account), so a downloaded copy is blocked by macOS until you remove the quarantine flag.
+
+Tell recipients:
+
+- Apple Silicon Macs only (Intel is not supported). The zip is several hundred MB, and the speech model downloads on first run, so they need internet once.
+- Unzip, move `Sona.app` to Applications.
+- In Terminal: `xattr -dr com.apple.quarantine /Applications/Sona.app`. Alternative: open the app once, then System Settings > Privacy & Security > Open Anyway. Right-click > Open no longer works on current macOS.
+- Open Sona and follow the setup wizard.
+
+**Updating:** quit Sona, replace the app. The new build has a new signature, so macOS forgets the permissions, and the wizard does not come back because setup is already marked done. To redo it:
+
+```bash
+tccutil reset All com.jlgamez.sona
+# then set "onboarding_completed": false in ~/.sona/user_config.json and reopen Sona
+```
 
 Plan and status: `docs/plans/003-electron-adoption.md`.
 

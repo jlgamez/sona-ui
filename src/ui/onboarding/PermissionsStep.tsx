@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Accessibility, Keyboard, Mic } from "lucide-react";
 import { toast } from "sonner";
 import { describeError } from "@/api/FetchUtils.ts";
 import {
@@ -51,6 +52,7 @@ export const PermissionsStep = ({ onContinue }: PermissionsStepProps) => {
       onContinue={onContinue}
     >
       <PermissionRow
+        icon={Mic}
         title="Microphone"
         reason="Records your voice while you hold the hotkey."
         state={state.microphone}
@@ -61,6 +63,7 @@ export const PermissionsStep = ({ onContinue }: PermissionsStepProps) => {
         }
       />
       <PermissionRow
+        icon={Keyboard}
         title="Input Monitoring"
         reason="Detects when you press and release the hotkey."
         state={state.inputMonitoring}
@@ -71,6 +74,7 @@ export const PermissionsStep = ({ onContinue }: PermissionsStepProps) => {
         }
       />
       <PermissionRow
+        icon={Accessibility}
         title="Accessibility"
         reason="Pastes the transcription where your cursor is."
         state={state.accessibility}
