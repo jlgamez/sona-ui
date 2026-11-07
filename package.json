@@ -9,7 +9,9 @@
     "build": "tsc -b && electron-vite build",
     "start": "electron-vite preview",
     "lint": "eslint .",
-    "prettier": "prettier --write ."
+    "prettier": "prettier --write .",
+    "backend:copy": "bash scripts/copy-backend.sh",
+    "pack": "npm run build && electron-builder --dir"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.15",
@@ -37,6 +39,7 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
     "electron": "^45.2.3",
+    "electron-builder": "^26.18.0",
     "electron-vite": "^6.0.0",
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^7.0.1",
