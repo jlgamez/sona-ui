@@ -7,6 +7,17 @@ export type WhisperModel = {
   isDownloading: boolean;
 };
 
+export type HotKeyOption = {
+  name: string;
+  display_name: string;
+  is_default: boolean;
+};
+
+export type AudioDevice = {
+  index: number;
+  name: string;
+};
+
 export type UserConfig = {
   clipboard_behaviour: {
     autonomous_pasting: boolean;
@@ -14,6 +25,7 @@ export type UserConfig = {
   };
   current_model: string;
   hot_key: string;
+  mic_device: string | null;
   intelligent_mode: boolean;
   text_selection_awareness: boolean;
 };

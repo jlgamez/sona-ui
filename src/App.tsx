@@ -5,20 +5,12 @@ import { useEffect, useState } from "react";
 import { useModelsStore } from "@/ui/settings/store/ModelsStore.ts";
 import { useFetchAvailableModels } from "@/ui/settings/hooks/useFetchAvailableModels.tsx";
 import { useFetchUserConfig } from "@/ui/settings/hooks/useFetchUserConfig.tsx";
-import { useHotKeyStore } from "@/ui/settings/store/HotKeyStore.ts";
 import { Spinner } from "@/components/ui/spinner.tsx";
-import { useClipboardStore } from "@/ui/settings/store/ClipboardStore.ts";
-import { useIntelligentModeStore } from "@/ui/settings/store/IntelligentModeStore.ts";
-import { useTextSelectionAwarenessStore } from "@/ui/settings/store/TextSelectionAwarenessStore.ts";
 import { motion } from "motion/react";
+import { Toaster } from "sonner";
 
 function App() {
-  const { initializeModels, setCurrentModelName } = useModelsStore();
-  const { initializeHotKeyWith } = useHotKeyStore();
-  const { setAutonomousPasteOn, setKeepOutputInClipboardOn } =
-    useClipboardStore();
-  const { setIsIntelligentModeEnabled } = useIntelligentModeStore();
-  const { setTextSelectionAwarenessOn } = useTextSelectionAwarenessStore();
+  const { initializeModels } = useModelsStore();
   const {
     loading: modelsLoading,
     models,
@@ -27,6 +19,7 @@ function App() {
   const {
     loading: configLoading,
     config,
+    setConfig,
     error: configError,
   } = useFetchUserConfig();
 
@@ -34,20 +27,8 @@ function App() {
     if (!modelsLoading && !modelsError) initializeModels(models);
   }, [modelsLoading, modelsError]);
 
-  useEffect(() => {
-    if (!configLoading && !configError && config) {
-      initializeHotKeyWith(config.hot_key);
-      setAutonomousPasteOn(config.clipboard_behaviour.autonomous_pasting);
-      setKeepOutputInClipboardOn(
-        config.clipboard_behaviour.keep_output_in_clipboard,
-      );
-      setIsIntelligentModeEnabled(config.intelligent_mode);
-      setTextSelectionAwarenessOn(config.text_selection_awareness);
-      setCurrentModelName(config.current_model);
-    }
-  }, [configLoading, configError, config]);
-
-  const isLoading = modelsLoading || configLoading || models.length === 0;
+  const isLoading =
+    modelsLoading || configLoading || models.length === 0 || !config;
   const hasError = modelsError || configError;
   const [currentPage, setCurrentPage] = useState<"welcome" | "settings">(
     "welcome",
@@ -66,6 +47,7 @@ function App() {
       devOnly={false}
       className="p-6"
     >
+      <Toaster />
       {hasError ? (
         <div className={"flex justify-center items-center h-screen w-full"}>
           There was an error loading settings
@@ -86,7 +68,11 @@ function App() {
           {currentPage === "welcome" ? (
             <Welcome onNavigateToSettings={() => setCurrentPage("settings")} />
           ) : (
-            <Settings onClose={() => setCurrentPage("welcome")} />
+            <Settings
+              savedConfig={config}
+              onSavedConfigChange={setConfig}
+              onClose={() => setCurrentPage("welcome")}
+            />
           )}
         </motion.div>
       )}

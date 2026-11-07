@@ -33,11 +33,7 @@ export const ClipboardBehaviourSection = () => {
         <ToggleSetting
           name={"Autonomous pasting"}
           description={
-            <>
-              When enabled Sona will paste the transcribed text on its own
-              <br />
-              Disabled when in Intelligent Mode
-            </>
+            "When enabled Sona will paste the transcribed text on its own"
           }
           //enabled={isIntelligentModeDisabled}
           onChange={handleAutonomousPasteChange}
@@ -47,7 +43,7 @@ export const ClipboardBehaviourSection = () => {
         <ToggleSetting
           name={"Keep output in clipboard"}
           description={
-            "When enabled, Sona will the latest output in the clipboard"
+            "When enabled, Sona will keep the latest output in the clipboard"
           }
           onChange={handleKeepOutputInClipboardChange}
           //defaultChecked={isKeepOutputInClipboard}

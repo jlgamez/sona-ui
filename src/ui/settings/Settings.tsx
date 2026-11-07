@@ -6,14 +6,22 @@ import { CurrentModelSection } from "@/ui/settings/sections/current-model/Curren
 import { ClipboardBehaviourSection } from "@/ui/settings/sections/clipboard/ClipboardBehaviourSection.tsx";
 import { IntelligentModeSection } from "@/ui/settings/sections/intelligent-mode/IntelligentModeSection.tsx";
 import { HotKeySelectionSection } from "@/ui/settings/sections/hot-key/HotKeySelectionSection.tsx";
+import { MicrophoneSection } from "@/ui/settings/sections/microphone/MicrophoneSection.tsx";
 import { SaveCancelAction } from "@/ui/settings/sections/save-cancel-action/SaveCancelAction.tsx";
 import { TextSelectionAwarenessSection } from "@/ui/settings/sections/text-selection-awareness/TextSelectionAwarenessSection.tsx";
+import type { UserConfig } from "@/ui/settings/types/SettingsTypes.ts";
 
 type SettingsProps = {
+  savedConfig: UserConfig;
+  onSavedConfigChange: (config: UserConfig) => void;
   onClose?: () => void;
 };
 
-export const Settings = ({ onClose }: SettingsProps) => {
+export const Settings = ({
+  savedConfig,
+  onSavedConfigChange,
+  onClose,
+}: SettingsProps) => {
   return (
     <div className={"relative h-full w-full"}>
       <div className={"pl-5 pr-5 min-w-full mb-4"}>
@@ -29,6 +37,8 @@ export const Settings = ({ onClose }: SettingsProps) => {
       >
         <HotKeySelectionSection />
         <Separator />
+        <MicrophoneSection />
+        <Separator />
         <IntelligentModeSection />
         <Separator />
         <TextSelectionAwarenessSection />
@@ -37,8 +47,12 @@ export const Settings = ({ onClose }: SettingsProps) => {
         <Separator />
         <CurrentModelSection />
         <Separator />
-        <AvailableModelsSection />
-        <SaveCancelAction onClose={onClose} />
+        <AvailableModelsSection onSavedConfigChange={onSavedConfigChange} />
+        <SaveCancelAction
+          savedConfig={savedConfig}
+          onSavedConfigChange={onSavedConfigChange}
+          onClose={onClose}
+        />
       </Stack>
     </div>
   );

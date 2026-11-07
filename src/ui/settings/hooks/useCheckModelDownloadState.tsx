@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { toast } from "sonner";
 import { buildUrlWith, get } from "@/api/FetchUtils.ts";
 import { ENDPOINT } from "@/api/ApiConstants.ts";
 import { useModelsStore } from "@/ui/settings/store/ModelsStore.ts";
@@ -30,9 +31,14 @@ export function useCheckModelDownloadState(modelName: string) {
     }
 
     const checkDownloadState = async () => {
-      const response = await get<DownloadStateResponse>(ENDPOINT_URL, {
-        name: modelName,
-      });
+      let response: DownloadStateResponse;
+      try {
+        response = await get<DownloadStateResponse>(ENDPOINT_URL, {
+          name: modelName,
+        });
+      } catch {
+        return false; // transient error: keep polling
+      }
 
       // Update flags only on change (store already guards redundant writes)
       const isDownloading = response.state === "downloading";
@@ -48,9 +54,10 @@ export function useCheckModelDownloadState(modelName: string) {
         return true;
       }
 
-      // Stop polling if server reports not_started
+      // Polling only runs after an accepted download, so not_started means it failed
       if (response.state === "not_started") {
         setModelDownloading(modelName, false);
+        toast.error(`Download of ${modelName} failed`);
         if (intervalRef.current) {
           clearInterval(intervalRef.current);
           intervalRef.current = null;

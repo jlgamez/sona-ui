@@ -17,8 +17,10 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
+export type DropDownOption = { value: string; label: string };
+
 export type DropDownProps = {
-  options: string[];
+  options: DropDownOption[];
   value?: string | null;
   placeholder?: string;
   emptyMessage?: string;
@@ -38,7 +40,8 @@ export function DropDown({
   const [internalValue, setInternalValue] = React.useState<string | null>(null);
 
   const value = controlledValue !== undefined ? controlledValue : internalValue;
-  const selectedLabel = value ?? "";
+  const selectedLabel =
+    options.find((option) => option.value === value)?.label ?? value ?? "";
 
   const handleSelect = (currentValue: string) => {
     if (currentValue === value) {
@@ -62,7 +65,12 @@ export function DropDown({
           aria-expanded={open}
           className={cn("w-[200px] justify-between", className)}
         >
-          <span className={cn(!selectedLabel && "text-muted-foreground")}>
+          <span
+            className={cn(
+              "truncate",
+              !selectedLabel && "text-muted-foreground",
+            )}
+          >
             {selectedLabel || placeholder}
           </span>
           <ChevronsUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -76,17 +84,17 @@ export function DropDown({
             <CommandGroup>
               {options.map((option) => (
                 <CommandItem
-                  key={option}
-                  value={option}
-                  onSelect={handleSelect}
+                  key={option.value}
+                  value={option.label}
+                  onSelect={() => handleSelect(option.value)}
                 >
                   <CheckIcon
                     className={cn(
                       "mr-2 h-4 w-4",
-                      value === option ? "opacity-100" : "opacity-0",
+                      value === option.value ? "opacity-100" : "opacity-0",
                     )}
                   />
-                  {option}
+                  {option.label}
                 </CommandItem>
               ))}
             </CommandGroup>

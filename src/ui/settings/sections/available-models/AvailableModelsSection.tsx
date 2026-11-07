@@ -10,19 +10,17 @@ import {
 
 import { useModelsStore } from "@/ui/settings/store/ModelsStore.ts";
 import { ModelRow } from "./ModelRow.tsx";
-import { deleteModel, downloadModel } from "@/api/PostActionsService.ts";
+import { removeModel, startModelDownload } from "@/ui/settings/modelActions.ts";
+import type { UserConfig } from "@/ui/settings/types/SettingsTypes.ts";
 
-export const AvailableModelsSection = () => {
-  const { getModels, setModelDownloading, setModelInSystem } = useModelsStore();
+type AvailableModelsSectionProps = {
+  onSavedConfigChange: (config: UserConfig) => void;
+};
 
-  const handleDownloadClick = (modelName: string) => {
-    downloadModel(modelName);
-    setModelDownloading(modelName, true);
-  };
-  const handleDeleteClick = (modelName: string) => {
-    deleteModel(modelName);
-    setModelInSystem(modelName, false);
-  };
+export const AvailableModelsSection = ({
+  onSavedConfigChange,
+}: AvailableModelsSectionProps) => {
+  const { getModels } = useModelsStore();
 
   return (
     <Stack direction={"column"}>
@@ -46,8 +44,10 @@ export const AvailableModelsSection = () => {
             <ModelRow
               key={model.name}
               model={model}
-              onDownload={handleDownloadClick}
-              onDelete={handleDeleteClick}
+              onDownload={startModelDownload}
+              onDelete={(modelName) =>
+                removeModel(modelName, onSavedConfigChange)
+              }
             />
           ))}
         </TableBody>

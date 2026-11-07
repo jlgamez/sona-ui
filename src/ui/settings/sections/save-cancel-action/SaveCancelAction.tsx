@@ -1,55 +1,59 @@
+import { useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button.tsx";
+import { Spinner } from "@/components/ui/spinner.tsx";
 import Stack from "@/common-components/Stack.tsx";
+import { describeError } from "@/api/FetchUtils.ts";
 import { saveUserConfig } from "@/api/PostActionsService.ts";
-import {
-  useHotKeyStore,
-  UI_TO_BACKEND_KEY_MAP,
-} from "@/ui/settings/store/HotKeyStore.ts";
-import { useClipboardStore } from "@/ui/settings/store/ClipboardStore.ts";
-import { useModelsStore } from "@/ui/settings/store/ModelsStore.ts";
-import { useIntelligentModeStore } from "@/ui/settings/store/IntelligentModeStore.ts";
-import { useTextSelectionAwarenessStore } from "@/ui/settings/store/TextSelectionAwarenessStore.ts";
+import { applyConfigToStores } from "@/ui/settings/applyConfigToStores.ts";
+import { useDraftConfig } from "@/ui/settings/hooks/useDraftConfig.ts";
+import type { UserConfig } from "@/ui/settings/types/SettingsTypes.ts";
 
 type SaveCancelActionProps = {
+  savedConfig: UserConfig;
+  onSavedConfigChange: (config: UserConfig) => void;
   onClose?: () => void;
 };
 
-export const SaveCancelAction = ({ onClose }: SaveCancelActionProps) => {
-  const handleSave = () => {
-    const selectedHotKey = useHotKeyStore.getState().selectedHotKey;
-    const { autonomousPasteOn, keepOutputInClipboardOn } =
-      useClipboardStore.getState();
-    const currentModelName = useModelsStore.getState().currentModelName;
-    const isIntelligentModeEnabled =
-      useIntelligentModeStore.getState().isEnabled;
-    const isTextSelectionAwarenessOn =
-      useTextSelectionAwarenessStore.getState().isTextSelectionAwarenessOn;
+export const SaveCancelAction = ({
+  savedConfig,
+  onSavedConfigChange,
+  onClose,
+}: SaveCancelActionProps) => {
+  const draft = useDraftConfig(savedConfig);
+  const [isSaving, setIsSaving] = useState(false);
+  // Both objects are built from savedConfig, so their key order matches.
+  const isDirty = JSON.stringify(draft) !== JSON.stringify(savedConfig);
 
-    if (!selectedHotKey) {
-      console.error("No hot key selected");
-      return;
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      await saveUserConfig(draft);
+      onSavedConfigChange(draft);
+      toast.success("Settings saved");
+      onClose?.();
+    } catch (error) {
+      toast.error(describeError(error));
+    } finally {
+      setIsSaving(false);
     }
+  };
 
-    saveUserConfig({
-      hot_key: UI_TO_BACKEND_KEY_MAP[selectedHotKey],
-      clipboard_behaviour: {
-        autonomous_pasting: autonomousPasteOn,
-        keep_output_in_clipboard: keepOutputInClipboardOn,
-      },
-      current_model: currentModelName,
-      intelligent_mode: isIntelligentModeEnabled,
-      text_selection_awareness: isTextSelectionAwarenessOn,
-    });
+  const handleCancel = () => {
+    applyConfigToStores(savedConfig);
     onClose?.();
   };
 
   return (
     <div className="w-full flex justify-end p-10">
       <Stack direction={"row"} spacing={4} align={"end"}>
-        <Button variant={"outline"} onClick={onClose}>
+        <Button variant={"outline"} onClick={handleCancel}>
           Cancel
         </Button>
-        <Button onClick={handleSave}>Save</Button>
+        <Button onClick={handleSave} disabled={!isDirty || isSaving}>
+          {isSaving && <Spinner />}
+          Save
+        </Button>
       </Stack>
     </div>
   );

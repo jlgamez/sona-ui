@@ -3,22 +3,20 @@ import Stack from "@/common-components/Stack.tsx";
 import Text from "@/common-components/Text.tsx";
 import { Spinner } from "@/components/ui/spinner.tsx";
 import { useModelsStore } from "@/ui/settings/store/ModelsStore.ts";
-import { downloadModel } from "@/api/PostActionsService.ts";
-import { useCheckModelDownloadState } from "@/ui/settings/hooks/useCheckModelDownloadState.tsx";
+import { startModelDownload } from "@/ui/settings/modelActions.ts";
 
 export const CurrentModelSection = () => {
-  const { getModels, getModel, setCurrentModelName, setModelDownloading } =
-    useModelsStore();
-  const models = Array.from(getModels().keys());
+  const { getModels, getModel, setCurrentModelName } = useModelsStore();
+  const models = Array.from(getModels().keys(), (name) => ({
+    value: name,
+    label: name,
+  }));
   const currentModelName = useModelsStore((state) => state.currentModelName);
 
   // Subscribe to store's downloading state for the selected model
   const isDownloading = useModelsStore(
     (state) => state.models.get(currentModelName ?? "")?.isDownloading ?? false,
   );
-
-  // Poll download state when downloading
-  useCheckModelDownloadState(currentModelName ?? "");
 
   const DOWNLOAD_WARNING = "Downloading %s...";
   const getDownloadWarning = (modelName: string) =>
@@ -31,9 +29,7 @@ export const CurrentModelSection = () => {
     const model = getModel(newModelSelection);
     if (model?.inSystem) return;
 
-    // Trigger actual download and update store
-    downloadModel(newModelSelection);
-    setModelDownloading(newModelSelection, true);
+    startModelDownload(newModelSelection);
   };
 
   return (
