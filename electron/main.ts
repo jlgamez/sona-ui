@@ -1,9 +1,10 @@
-import { app, BrowserWindow, dialog } from "electron";
+import { app, BrowserWindow, dialog, type Tray } from "electron";
 import { spawn, type ChildProcess } from "node:child_process";
 import { existsSync } from "node:fs";
 import { createServer } from "node:net";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { createTray } from "./tray";
 
 const READY_TIMEOUT_MS = 90_000;
 const READY_POLL_MS = 500;
@@ -13,6 +14,9 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 
 let backend: ChildProcess | null = null;
 let quitting = false;
+let mainWindow: BrowserWindow | null = null;
+let backendPort = 0;
+let tray: Tray | null = null;
 
 function getFreePort(): Promise<number> {
   return new Promise((resolve, reject) => {
@@ -44,9 +48,12 @@ function startBackend(port: number): ChildProcess {
   if (!existsSync(executable)) {
     throw new Error(`Backend not found at ${executable}`);
   }
-  const child = spawn(executable, ["--port", String(port)], {
-    stdio: ["ignore", "pipe", "pipe"],
-  });
+  const child = spawn(
+    executable,
+    ["--port", String(port), "--exit-when-parent-dies"],
+    // stdin stays open as a pipe: when Electron dies the OS closes it and the backend stops itself.
+    { stdio: ["pipe", "pipe", "pipe"] },
+  );
   const log = (stream: NodeJS.ReadableStream) =>
     stream.on("data", (chunk: Buffer) => {
       for (const line of chunk.toString().split("\n")) {
@@ -91,10 +98,19 @@ function stopBackend(): void {
   setTimeout(() => child.kill("SIGKILL"), KILL_TIMEOUT_MS).unref();
 }
 
-function createWindow(port: number): void {
+function showWindow(): void {
+  if (mainWindow === null || mainWindow.isDestroyed()) {
+    mainWindow = createWindow(backendPort);
+  }
+  mainWindow.show();
+  mainWindow.focus();
+}
+
+function createWindow(port: number): BrowserWindow {
   const window = new BrowserWindow({
     width: 900,
     height: 700,
+    show: false,
     webPreferences: {
       preload: path.join(here, "../preload/index.cjs"),
       contextIsolation: true,
@@ -103,21 +119,46 @@ function createWindow(port: number): void {
       additionalArguments: [`--sona-api-base-url=http://127.0.0.1:${port}`],
     },
   });
+  // Closing hides the window so push-to-talk keeps working; only Quit exits.
+  window.on("close", (event) => {
+    if (!quitting) {
+      event.preventDefault();
+      window.hide();
+    }
+  });
   const devUrl = process.env.ELECTRON_RENDERER_URL;
   if (devUrl) {
     void window.loadURL(devUrl);
   } else {
     void window.loadFile(path.join(here, "../renderer/index.html"));
   }
+  return window;
 }
 
 async function main(): Promise<void> {
+  if (!app.requestSingleInstanceLock()) {
+    app.quit();
+    return;
+  }
+  app.on("second-instance", () => {
+    if (backendPort !== 0) showWindow();
+  });
   await app.whenReady();
+  app.dock?.hide();
   try {
-    const port = await getFreePort();
-    backend = startBackend(port);
-    await waitUntilReady(port);
-    createWindow(port);
+    backendPort = await getFreePort();
+    backend = startBackend(backendPort);
+    tray = createTray(here, {
+      openSettings: showWindow,
+      quit: () => app.quit(),
+    });
+    await waitUntilReady(backendPort);
+    // Started by the login item: stay in the menu bar until the user opens Settings.
+    if (process.argv.includes("--hidden")) {
+      mainWindow = createWindow(backendPort);
+    } else {
+      showWindow();
+    }
   } catch (error) {
     dialog.showErrorBox("Sona could not start", String(error));
     app.quit();
@@ -127,7 +168,9 @@ async function main(): Promise<void> {
 app.on("before-quit", () => {
   quitting = true;
   stopBackend();
+  tray?.destroy();
 });
-app.on("window-all-closed", () => app.quit());
+// Closing the last window must not quit: Sona lives in the menu bar.
+app.on("window-all-closed", () => {});
 
 void main();

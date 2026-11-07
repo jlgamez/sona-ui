@@ -6,6 +6,10 @@ files:
   - out/**
   - package.json
 extraResources:
+  - from: build
+    to: tray
+    filter:
+      - trayTemplate*.png
   - from: resources/sona-backend
     to: sona-backend
 mac:
@@ -15,4 +19,5 @@ mac:
   entitlements: build/entitlements.mac.plist
   entitlementsInherit: build/entitlements.mac.plist
   extendInfo:
+    LSUIElement: true
     NSMicrophoneUsageDescription: Sona records your voice to transcribe it.
