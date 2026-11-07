@@ -15,6 +15,7 @@ extraResources:
 mac:
   target: dir
   category: public.app-category.productivity
+  icon: build/icon.icns
   identity: "-"
   entitlements: build/entitlements.mac.plist
   entitlementsInherit: build/entitlements.mac.plist
