@@ -1,16 +1,19 @@
 import { useState } from "react";
 import Text from "@/common-components/Text.tsx";
+import { HotKeyHint } from "@/ui/onboarding/Keycap.tsx";
 import { StepLayout } from "@/ui/onboarding/StepLayout.tsx";
 
 type TryItStepProps = {
-  hotKeyLabel: string;
+  hotKeyLabel?: string;
   saving: boolean;
+  onBack: () => void;
   onFinish: () => void;
 };
 
 export const TryItStep = ({
   hotKeyLabel,
   saving,
+  onBack,
   onFinish,
 }: TryItStepProps) => {
   const [text, setText] = useState("");
@@ -19,9 +22,15 @@ export const TryItStep = ({
   return (
     <StepLayout
       title="Try it"
-      description={`Click the box, hold ${hotKeyLabel}, say something, then release. Your words appear here.`}
+      description={
+        <>
+          Click the box, hold <HotKeyHint label={hotKeyLabel} />, say something,
+          then release. Your words appear here.
+        </>
+      }
       canContinue={!saving}
       continueLabel={worked ? "Finish" : "Finish without testing"}
+      onBack={onBack}
       onContinue={onFinish}
     >
       <textarea

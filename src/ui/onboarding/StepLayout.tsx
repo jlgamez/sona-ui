@@ -1,5 +1,5 @@
 import { Children, type ReactNode } from "react";
-import { ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { motion, type Variants } from "motion/react";
 import Stack from "@/common-components/Stack.tsx";
 import Text from "@/common-components/Text.tsx";
@@ -7,12 +7,14 @@ import { Button } from "@/components/ui/button.tsx";
 
 type StepLayoutProps = {
   title: string;
-  description: string;
+  description: ReactNode;
   children: ReactNode;
   canContinue: boolean;
   onContinue: () => void;
   /** Text for the final step; without it the button is a round arrow. */
   continueLabel?: string;
+  /** Shows a quiet Back button on the left. */
+  onBack?: () => void;
   /** Shown as a quiet secondary button when the step can be skipped. */
   onSkip?: () => void;
 };
@@ -34,6 +36,7 @@ export const StepLayout = ({
   canContinue,
   onContinue,
   continueLabel,
+  onBack,
   onSkip,
 }: StepLayoutProps) => (
   <motion.div
@@ -58,28 +61,38 @@ export const StepLayout = ({
       ))}
     </Stack>
     <motion.div variants={item}>
-      <Stack direction="row" spacing={3} justify="end">
-        {onSkip && (
-          <Button variant="ghost" onClick={onSkip}>
-            Skip
-          </Button>
-        )}
-        {continueLabel ? (
-          <Button onClick={onContinue} disabled={!canContinue}>
-            {continueLabel}
-            <ArrowRight className="ml-2 size-4" />
+      <Stack direction="row" spacing={3} align="center" justify="between">
+        {onBack ? (
+          <Button variant="ghost" onClick={onBack}>
+            <ArrowLeft className="mr-2 size-4" />
+            Back
           </Button>
         ) : (
-          <Button
-            size="icon"
-            onClick={onContinue}
-            disabled={!canContinue}
-            aria-label="Continue"
-            className="group size-11 rounded-full shadow-sm transition-all disabled:opacity-30"
-          >
-            <ArrowRight className="size-5 transition-transform group-hover:translate-x-0.5" />
-          </Button>
+          <span />
         )}
+        <Stack direction="row" spacing={3} align="center">
+          {onSkip && (
+            <Button variant="ghost" onClick={onSkip}>
+              Skip
+            </Button>
+          )}
+          {continueLabel ? (
+            <Button onClick={onContinue} disabled={!canContinue}>
+              {continueLabel}
+              <ArrowRight className="ml-2 size-4" />
+            </Button>
+          ) : (
+            <Button
+              size="icon"
+              onClick={onContinue}
+              disabled={!canContinue}
+              aria-label="Continue"
+              className="group size-11 rounded-full shadow-sm transition-all disabled:opacity-30"
+            >
+              <ArrowRight className="size-5 transition-transform group-hover:translate-x-0.5" />
+            </Button>
+          )}
+        </Stack>
       </Stack>
     </motion.div>
   </motion.div>
